@@ -1,0 +1,144 @@
+# Journal
+# This script manages the encryption for a journal.
+# Run this script with "bash", not "sh"
+#
+# (c) Jonathan Smithers 2013
+# jonathansmithers.com
+
+
+
+
+# CONFIGURABLE VARIABLES
+editor="xdg-open"
+
+backup_path="./backs/"
+backup_name=`date +"%Y%m%d%H%M"`_journal_backup
+encryptedjournal_name="nothing.gpg"
+encryptedjournal_path="./"
+
+
+echo "        __   __   _      __  _    __   __"
+echo "| /| / /  / /_/  / \    /_  /_|  /_   /_ "
+echo "|/ |/ /__/ / \  /__/   __/ /  | /    /__ "
+echo
+echo
+
+
+
+# NONCONFIGURABLE VARIABLES
+decryptedjournal_fullpath="./my unencrypted journal"
+encryptedjournal_fullpath="$encryptedjournal_path$encryptedjournal_name"
+backup_fullpath="$backup_path/$backup_name"
+
+# VALIDATE VARIABLES
+	# does encrypted file exist?
+	if [ ! -e $encryptedjournal_fullpath ]  ;then
+		echo "Your journal file '$encryptedjournal_fullpath' does not exist"
+		echo "Press enter to create an empty journal with a new password"
+		read
+		tempfile="./temporary_file_(your_brand_new_unencrypted_journal)"
+		echo "I made this for you <3" > $tempfile
+		echo $pass | gpg --output "$encryptedjournal_fullpath" -c "$tempfile"
+		if [ -e $encryptedjournal_fullpath ]  ;then
+			echo "Excellent! Restart this program to start journalling."
+			exit 0
+		fi
+		echo "Seems there was a problem. You'll have to try again."
+		exit 1
+	fi
+
+	# does backup folder exist?
+	if [ ! -e $backup_path ] ;then
+		echo "Your backup folder '$backup_path' does not exist."
+		echo "Please set backup_path to an existing folder"
+		exit 0
+	fi
+
+# BACKUP
+	timestamp=`date +"%Y%m%d%H%M"`
+	cp $encryptedjournal_fullpath $backup_fullpath
+
+# GET PASSWORD
+	#prompt for password (in a very fancy way)
+			prompt="Password: "
+			while IFS= read -p "$prompt" -r -s -n 1 char
+			do
+			    if [[ $char == $'\0' ]]
+			    then
+			        break
+			    fi
+			    prompt='*'
+			    pass+="$char"
+			done	
+			echo
+	#http://stackoverflow.com/questions/1923435/how-do-i-echo-stars-when-reading-password-with-read
+
+	#an alternative, simple way to get a password
+			# echo -n "Password: "
+			#read -s pass
+
+# DECRYPT
+	# gpg thoughts.gpg
+	# gpg --passphrase "hey" thoughts.gpg
+	echo $pass | gpg --passphrase-fd 0 --output "$decryptedjournal_fullpath" "$encryptedjournal_fullpath"
+	#http://unix.stackexchange.com/questions/60213/gpg-asks-for-password-even-with-passphrase/68726#68726
+	#Specifying 0 causes --passphrase-fd to read from STDIN rather than a file. So, piping the passphrase will get --passphrase-fd to accept your specified string. 
+
+	if [ ! -e "$decryptedjournal_fullpath" ] ;then
+		# clear
+		echo "Failed to decrypt."
+		# echo
+		exit 1
+	fi
+
+	echo "Unencrypted file \"$decryptedjournal_fullpath\" has been created."
+
+# APPEND DATE TO FILE
+	echo -e "\n" >> "$decryptedjournal_fullpath" 
+	date +"%Y%m%d%H%M" >> "$decryptedjournal_fullpath"
+
+# OPEN FILE
+	#echo -n "Press ENTER to open "
+	#read input
+	clear
+	echo "$editor \"$decryptedjournal_fullpath\""
+	$editor "$decryptedjournal_fullpath"
+
+
+echo -n "Would you like to save your file, $USER? (Y/n) "
+
+
+while :
+do
+	read in
+	if [ "$in" == "Y" ]
+	then
+		echo $pass | gpg -c --passphrase-fd 0 --batch --yes --output "$encryptedjournal_fullpath" "$decryptedjournal_fullpath"
+		#gpg -c --passphrase $pass --batch --yes thoughts
+		#     ^encrypt    ^pass      ^overwrite
+		echo
+		echo -n "Press enter to delete unencrypted version. "
+		read in
+		if [ -n $in ] ; then
+			rm -v "$decryptedjournal_fullpath"
+		fi
+		echo 'DONE'
+		exit 0
+		
+	elif [ "$in" = "n" ] 
+	then
+		echo -n "Press enter to delete unencrypted version. "
+		read input
+		if [ ! -n "$input" ] ; then
+			rm -v "$decryptedjournal_fullpath"
+			exit 0
+		else
+			clear
+			echo "File remains."
+			echo
+			exit 1
+		fi
+	else
+		echo -n "(Y/n) "
+	fi
+done
