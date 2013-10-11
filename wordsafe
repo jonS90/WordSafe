@@ -122,7 +122,7 @@ do
 		echo -n "Press enter to delete unencrypted version. "
 		read in
 		if [ -n $in ] ; then
-			rm -v "$decryptedjournal_fullpath"
+			shred --remove "$decryptedjournal_fullpath"
 		fi
 		echo 'DONE'
 		exit 0
@@ -132,7 +132,7 @@ do
 		echo -n "Press enter to delete unencrypted version. "
 		read input
 		if [ ! -n "$input" ] ; then
-			rm -v "$decryptedjournal_fullpath"
+			shred --remove "$decryptedjournal_fullpath"
 			exit 0
 		else
 			clear
