@@ -9,11 +9,11 @@
 
 
 # CONFIGURABLE VARIABLES
-editor="xdg-open"
+editor="xdg-open" #terminal command for your editor of choice
 
-backup_path="./backs/"
+backup_path="./.journal_backups"
 backup_name=`date +"%Y%m%d%H%M"`_journal_backup
-encryptedjournal_name="nothing.gpg"
+encryptedjournal_name="$USER's journal.gpg"
 encryptedjournal_path="./"
 
 
@@ -26,20 +26,24 @@ echo
 
 
 # NONCONFIGURABLE VARIABLES
-decryptedjournal_fullpath="./my unencrypted journal"
+decryptedjournal_fullpath="./$USER's unencrypted journal"
 encryptedjournal_fullpath="$encryptedjournal_path$encryptedjournal_name"
 backup_fullpath="$backup_path/$backup_name"
 
 # VALIDATE VARIABLES
 	# does encrypted file exist?
-	if [ ! -e $encryptedjournal_fullpath ]  ;then
-		echo "Your journal file '$encryptedjournal_fullpath' does not exist"
+	if [ ! -e "$encryptedjournal_fullpath" ]  ;then
 		echo "Press enter to create an empty journal with a new password"
 		read
 		tempfile="./temporary_file_(your_brand_new_unencrypted_journal)"
-		echo "I made this for you <3" > $tempfile
+		echo "This is your journal. I made this for you <3" > $tempfile
+		echo -e "\n" >> $tempfile
+		echo "Tip: To use a different editor, open up the bash file and modify the line starting with \"editor=\"" >> $tempfile
+		echo -e "\n" >> $tempfile
+		echo "Let's see, today's date is..." >> $tempfile
 		echo $pass | gpg --output "$encryptedjournal_fullpath" -c "$tempfile"
-		if [ -e $encryptedjournal_fullpath ]  ;then
+		rm "$tempfile"
+		if [ -e "$encryptedjournal_fullpath" ]  ;then
 			echo "Excellent! Restart this program to start journalling."
 			exit 0
 		fi
@@ -48,15 +52,13 @@ backup_fullpath="$backup_path/$backup_name"
 	fi
 
 	# does backup folder exist?
-	if [ ! -e $backup_path ] ;then
-		echo "Your backup folder '$backup_path' does not exist."
-		echo "Please set backup_path to an existing folder"
-		exit 0
+	if [ ! -e "$backup_path" ] ;then
+		mkdir --parents --verbose "$backup_path"
 	fi
 
 # BACKUP
 	timestamp=`date +"%Y%m%d%H%M"`
-	cp $encryptedjournal_fullpath $backup_fullpath
+	cp "$encryptedjournal_fullpath" "$backup_fullpath"
 
 # GET PASSWORD
 	#prompt for password (in a very fancy way)
