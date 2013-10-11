@@ -119,7 +119,7 @@ do
 		#gpg -c --passphrase $pass --batch --yes thoughts
 		#     ^encrypt    ^pass      ^overwrite
 		echo
-		echo -n "Press enter to delete unencrypted version. "
+		echo -n "Press enter to shred unencrypted version. "
 		read in
 		if [ -n $in ] ; then
 			shred --remove "$decryptedjournal_fullpath"
@@ -129,7 +129,7 @@ do
 		
 	elif [ "$in" = "n" ] 
 	then
-		echo -n "Press enter to delete unencrypted version. "
+		echo -n "Press enter to shred unencrypted version. "
 		read input
 		if [ ! -n "$input" ] ; then
 			shred --remove "$decryptedjournal_fullpath"
