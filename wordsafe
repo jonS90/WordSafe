@@ -27,7 +27,7 @@ echo
 
 # NONCONFIGURABLE VARIABLES
 decryptedjournal_fullpath="./$USER's unencrypted journal"
-encryptedjournal_fullpath="$encryptedjournal_path$encryptedjournal_name"
+encryptedjournal_fullpath="$encryptedjournal_path/$encryptedjournal_name"
 backup_fullpath="$backup_path/$backup_name"
 
 # VALIDATE VARIABLES
