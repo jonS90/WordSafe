@@ -1,0 +1,190 @@
+# CONFIG_FILE="./$0.config"
+DEFAULT_JOURNAL="~/.$0/journal"
+DEFAULT_DECRYPTED_JOURNAL="~/.$0/unencrypted_journal.txt"
+CONFIG_FILE="~/.$0/config" #don't change this.
+
+VERSION="some alpha stage"
+
+echo "hi"
+set_config_value() {
+   #get arguments
+   key=$1
+   value=$2
+
+   #make sure key exists
+   foundKey=$(cat "$CONFIG_FILE" | grep "$key=")
+   if [ "$foundKey" = "" ] ; then
+      # echo "This key isn't in yet"
+      echo "$key=not_set!" >> "$CONFIG_FILE"
+   fi
+
+   #replace value
+   sed  "s/$key=.*/$key=$value/" "$CONFIG_FILE" > temporarySDFLKJSDFLKJSEFLIJSGSDFLKSN
+   mv temporarySDFLKJSDFLKJSEFLIJSGSDFLKSN "$CONFIG_FILE"
+}
+
+get_config_value() {
+    key="$1"
+    cat "$CONFIG_FILE" | grep "^$key=" | cut -f2 -d"="
+}
+
+setup_wizard() {
+    clear
+    echo "This is the setup wizard"
+    errorCode=-1
+    while [ ! $errorCode -eq 0 ] 
+    do
+        tempfile="temporary_file_asdfhjklasdfhjklasdfhjkl"
+        verificationtext="Hello $USER. If you're reading this, your editor should do just fine!"
+
+        echo "Please enter the command corresponding to your text-editor of choice."
+        echo "Some examples are \"gedit\", \"pyroom\", and \"vim\""
+        read editor
+        clear
+        echo "I must verify that '$editor' will work. When it launches, please do the following:"
+        echo "   1. Verify that your editor opened an existing file, NOT A BLANK DOCUMENT."
+        echo "   2. Close the program to continue this setup wizard."
+        echo "Press enter now"
+        read
+        echo "$editor $tempfile"
+        echo "$verificationtext" | cat > $tempfile
+        $editor $tempfile
+        errorCode=$?
+        if [ ! $errorCode -eq 0 ] ; then
+            clear
+            echo -n "I got error code $errorCode. "
+            if [ $errorCode -eq 127 ] ; then
+                echo "\"$editor\" is not a valid command."
+            else
+                echo "Please try again."
+            fi
+            continue
+        else
+            clear   
+            while :
+            do
+                echo "I executed \"$editor $tempfile\""
+                echo "Did your editor open a blank document? (y/n)"
+                read input
+                if [ "$input" = "y" ] ; then
+                    break;
+                fi
+                if [ "$input" = "n" ] ; then
+
+                    break;
+                fi
+
+            done
+            
+            if [ "$input" = "n" ] ; then
+                echo "Good job. I'll remember to use \"$editor\""
+                break;
+            fi
+            if [ "$input" = "y" ] ; then
+                echo "Sorry, that text editor won't work. You must choose another."
+                errorCode=1
+                continue
+            fi
+
+        fi
+        echo $?
+        rm $tempfile
+    done
+    set_config_value editor $editor
+    # echo "$(get_config_value editor) you got"
+}
+
+dispatcher() {
+    #http://stackoverflow.com/questions/7069682/how-to-get-arguments-with-flags-in-bash-script
+
+
+    if [ -e $CONFIG_FILE ] ; then
+        echo "This appears to be your first launch. You must run a setup wizard before doing anything else."
+        setup_wizard
+        exit 0;
+    fi
+
+    # wordsafe -h
+    # wordsafe <filepath> 
+    # wordsafe --change_password <filepath>
+    # wordsafe --no_splash <filepath>
+    # wordsafe --version
+    # wordsafe --editor <editor> <fileapth>
+    # wordsafe --change-editor <editor>
+    # wordsafe                            < open default file defined in wizard, stored in config.....or, print help?
+
+    if [ -e $CONFIG_FILE ]  ; then  
+        editor=$(get_config_value editor)
+    fi
+
+    while [ $# -gt 0 ] ; do
+            case "$1" in
+                    -h|--help)
+                        echo "WordSafe - encrypted journaling"
+                        echo
+                        echo "Usage: wordsafe [-options] [file]"
+                        echo
+                        echo "--setup            Run a setup wizard for a journal in current directory and exit"
+                        echo "--editor <cmd>     Use specified editor instead of usual editor."
+                        echo "-h, -help          Print some help and exit"
+                        echo "-v, -version       Print version and exit"
+                        echo "-stfu              Skip the grandios title display when launched"
+                        exit 0
+                        ;;
+                    -v|--version)
+                        echo "Version: $VERSION"
+                        exit 0
+                        ;;
+                    --editor)
+                        editor=$2
+                        echo "editor: $editor"
+                        shift 2
+                        ;;
+                    -*)
+                            echo "Unrecognized flag \"$1\""
+                            exit 1
+                            ;;
+                    *)
+                            filepath="$1"
+                            echo "filepath: $filepath"
+                            if [ ! -e "$filepath" ] ; then
+                                echo "Could not find file \"$filepath\""
+                                exit 1
+                            fi
+                            
+                            break
+                            ;;
+            esac
+    done
+
+
+
+
+}
+
+
+echo "hi"
+dispatcher "$@"
+
+
+# echo "$(get_config_value editor)" 
+# setup_wizard
+
+exit
+
+#check for config file
+if [ ! -f $CONFIG_FILE ] ; then
+    echo "Creating new config file '$CONFIG_FILE'"
+    echo "" | cat > $CONFIG_FILE
+
+    echo "Would you like a setup wizard for a single journal? (y/n)"
+
+fi
+
+
+
+
+exit
+
+#http://stackoverflow.com/questions/2464760/modify-config-file-using-bash-script
+sed -c -i "s/\($TARGET_KEY *= *\).*/\1$REPLACEMENT_VALUE/" $CONFIG_FILE
