@@ -1,0 +1,339 @@
+#!/usr/bin/env ruby
+#what does this even do?
+
+# (c) Jon Smithers 2014
+
+
+require 'pathname'
+require 'tempfile'
+require 'io/console'
+require 'parseconfig'
+require 'openssl'
+
+class WordSafe
+	PROGRAM_NAME = "WordSafe"
+	DEFAULT_JOURNAL="~/.#{PROGRAM_NAME}/journal"
+	DEFAULT_DECRYPTED_JOURNAL="~/.#{PROGRAM_NAME}/unencrypted_journal.txt"
+	CONFIG_FILE="./config"
+	VERSION="some alpha stage"
+	KEYLENGTH = 128
+	@config = ""
+	@cipher = OpenSSL::Cipher::AES.new(128, :CBC)
+	@key = ""
+	@editor = ""
+	# key = OpenSSL::PKCS5::pbkdf2_hmac(password, "salt", 5, KEYLENGTH, (OpenSSL::Digest::SHA1.new))
+
+	def initialize
+		config_init()
+		config_save
+	end
+
+	def set_key(password)
+		@key = OpenSSL::PKCS5::pbkdf2_hmac(password, "salt", 5, KEYLENGTH, (OpenSSL::Digest::SHA1.new))
+	end
+
+	def key!()
+		if (@key == "")
+			raise RuntimeError, "key not set"
+		end
+	end
+
+	def encrypt(plaintext) 
+		key!
+		cipher = OpenSSL::Cipher.new("AES-#{KEYLENGTH}-CBC")
+		cipher.encrypt
+		cipher.key = @key
+		cipher.update(plaintext) + cipher.final
+	end
+
+	def decrypt(ciphertext)
+		key!
+		decipher = OpenSSL::Cipher.new("AES-#{KEYLENGTH}-CBC")
+		decipher.decrypt
+		decipher.key = @key
+		decipher.update(ciphertext) + decipher.final
+	end
+
+
+
+
+	# Prints sort of a title or splash screen to the terminal
+	def print_title
+		puts
+		puts "\`7MMF'     A     \`7MF'                  \`7MM   .M\"\"\"bgd            .d' \"\"      "
+		puts "  \`MA     ,MA     ,V                      MM  ,MI    \"Y            dM\`         "
+		puts "   VM:   ,VVM:   ,V ,pW\"Wq.\`7Mb,od8  ,M\"\"bMM  \`MMb.      ,6\"Yb.   mMMmm.gP\"Ya  "
+		puts "    MM.  M' MM.  M'6W'   \`Wb MM' \"',AP    MM    \`YMMNq. 8)   MM    MM ,M'   Yb "
+		puts "    \`MM A'  \`MM A' 8M     M8 MM    8MI    MM  .     \`MM  ,pm9MM    MM 8M\"\"\"\"\"\" "
+		puts "     :MM;    :MM;  YA.   ,A9 MM    \`Mb    MM  Mb     dM 8M   MM    MM YM.    , "
+		puts "      VF      VF    \`Ybmd9'.JMML.   \`Wbmd\"MML.P\"Ybmmd\"  \`Moo9^Yo..JMML.\`Mbmmd' "
+		puts
+		puts
+	end
+
+	# Prints help
+	def print_help
+		puts "WordSafe - version #{VERSION}
+			
+	usage: wordsafe [switches] [encrypted_journal]
+				(to edit encrypted file)
+	   or: wordsafe [switches]
+	   			(to configure persistent settings)
+
+	switches:
+	-h, --help                   Print some help and exit
+	-v, --version                Print version and exit                                           #finalize
+	    --setup                  Run a setup wizard for a journal in current directory and exit
+	    --new		     Runs a wizard to create a new encrypted journal with a new password
+	-e, --editor <cmd>           Use specified editor just this once
+	-E, --change-editor <cmd>    Use specified editor from here on out
+	-P, --change-password <file> Change the encryption passphrase for specified file
+	    --restore-backup <file>  Enter wizard to restore previous version of file
+	    --stfu                   Skip the grandios title display when launched"
+	end
+
+	def clear_console()
+		system "clear" unless system "cls"
+		# http://stackoverflow.com/questions/3170553/how-can-i-clear-the-terminal-in-ruby
+		# I think this is cross-platform
+	end
+
+
+	def config_init()
+		if (!File.file?(CONFIG_FILE))
+			puts "Creating new configuration file"
+			f = File.open(CONFIG_FILE, "w")
+			f.write("[general]\neditor=gedit");
+			f.close();
+		end
+
+
+		@config = ParseConfig.new(CONFIG_FILE)
+	end
+
+	def config_save()
+		file = File.open(CONFIG_FILE,'w')
+		@config.write(file)
+		file.close
+	end
+
+	def setup_wizard()
+		raise "This is not supported yet"
+		puts 'This is the setup wizard'
+
+		user = 'echo $USER'
+		tempfile = "temporary_file_asdfhjklasdfhjklasdfhjkl"
+		File.open(tempfile, "w") {|f| f.write("Hello human. If you're reading this, your editor should do just fine!")}
+
+		exit_status = false
+		while (!exit_status) do
+			puts "Please enter the command corresponding to your text-editor of choice."
+			puts "Some examples are \"gedit\", \"pyroom\", and \"vim\""
+			print "> "
+			editor = $stdin.gets.chomp
+			clear_console
+			puts "I must verify that '#{editor}' will work. When it launches, please do the following:"
+			puts "   1. Verify that your editor opened an existing file, NOT A BLANK DOCUMENT."
+			puts "   2. Close the program to continue this setup wizard."
+			puts "Press enter now"
+			gets
+			
+			puts "#{editor} #{tempfile}"
+			exit_status = system "#{editor} #{tempfile}"
+
+
+			if (exit_status != true)
+				puts "bad editor!"
+			end
+		end 
+
+		@config["general"]["editor"] = editor
+	end
+
+	def new_empty_journal(path) 
+		key!
+
+		# plain = new Tempfile.new('emptyjournal')
+		# plain.write("Welcome to your new journal")
+		# plain.close
+		# plain.unlink
+
+		encrypted = File.open(path, "w")
+		encrypted.write( encrypt "Welcome to your new journal" )
+		encrypted.close
+
+
+
+	end
+
+	def get_password()
+		print "password: "
+		password = STDIN.noecho(&:gets).chomp
+		puts "unicorns"
+		set_key(password)
+	end
+
+	def have_key
+		if (@key.nil? || @key.empty?) #nil? seems necessary, even though I have no idea how "" turns into nil. 
+			get_password
+		end
+	end
+
+	def have_editor
+		if (defined?(@editor)).nil? || @editor.empty?
+			@editor = @config["general"]["editor"]
+		end
+		if (defined?(@editor)).nil? || @editor.empty?
+			puts "Defaulting editor to xdg-open"
+			editor = "xdg-open"
+		end
+	end
+
+
+	def new_journal(path_str)
+		get_password
+
+		path = Pathname.new(path_str)
+		if (path.directory?)
+			path = Pathname.new(path.realpath + "journal")
+			
+			if (path.exist?)
+				raise ArgumentError, ("\"" + path.to_s + "\" already exists")
+			end
+			
+			new_empty_journal path
+			puts "journal created at \"#{path.to_s}\""
+		else
+			if (path.exist?)
+				plaintext = File.read(path.realpath)
+
+				newpath = Pathname.new(path.to_s + ".wordsafe")
+				if (newpath.exist?)
+					raise ArgumentError, ("\"" + newpath.to_s + "\" already exists")
+				end
+				encrypted = File.open(newpath, "w")
+				encrypted.write(encrypt plaintext)
+				encrypted.close
+
+				puts "\"" + path.to_s + "\" encrypted to \"" + newpath.to_s
+			else
+				new_empty_journal path
+				puts "journal created at \"#{path.to_s}\""
+			end
+		end
+	end
+
+
+	def exist!(pathname)
+		if (pathname.directory?)
+			raise ArgumentError, "This is a directory: \"#{arg}\""
+		end
+
+		if (!pathname.exist?)
+			raise IOError, "File does not exist: \"#{arg}\""
+		end
+
+		if (!pathname.readable?)
+			raise IOError, "File cannot be read: \"#{arg}\""
+		end
+	end
+
+	def open_journal(path_str)
+		have_key
+		have_editor
+
+		journal = Pathname.new(path_str)
+		exist!(journal)
+
+
+		decrypted_journal = Tempfile.new('decrypted_journal')
+		clear_console
+
+		decrypted_journal.write(decrypt File.read(journal))
+		decrypted_journal.close
+
+		puts "#{@editor} #{decrypted_journal.path}"
+		system "#{@editor} #{decrypted_journal.path}"
+
+
+		
+		decrypted_journal.unlink
+	end
+
+	def change_password (path_str)
+		have_key
+		have_editor
+
+		journal = Pathname.new(path_str)
+		exist!(journal)
+
+		plaintext = decrypt File.read(journal)
+
+		get_password
+
+		newF = File.open(journal.to_s, "w")
+		newF.write(encrypt plaintext)
+		puts "changed password"
+	end
+
+	def readArgs
+		if (ARGV.size == 0)
+			puts "I have nothing to do"
+		end
+
+		while (ARGV.size != 0) do
+			arg = ARGV.shift()
+		  	case arg
+			when "-h", "--help"
+				print_help
+				exit
+			when "-v", "--version"
+				puts VERSION
+				exit
+			when "--setup"
+				setup_wizard
+				exit
+			when "--new"
+				if (ARGV.size == 0)
+					raise ArgumentError, "Must specify a path for #{arg} tag"
+				end
+				arg = ARGV.shift()
+				new_journal arg
+				exit
+			when "-e", "--editor"
+				if (ARGV.size == 0)
+					raise ArgumentError, "Must specify an argument for #{arg} tag"
+				end
+				@editor = ARGV.shift
+			when "-E", "--change-editor"
+				if (ARGV.size == 0)
+					raise ArgumentError, "Must specify an argument for #{arg} tag"
+				end
+				@editor = ARGV.shift
+				@config["general"]["editor"] = @editor
+				config_save
+			when "-P", "--change-password"
+				if (ARGV.size == 0)
+					raise ArgumentError, "Must specify a path for #{arg} tag"
+				end
+				arg = ARGV.shift
+				change_password(arg)
+			when "--open-config"
+				puts "xdg-open #{CONFIG_FILE}"
+				`xdg-open #{CONFIG_FILE}`
+				exit
+			else
+				if ((arg.each_char.to_a)[0] === "-")
+					raise ArgumentError, "Unrecognized flag \"#{arg}\""
+				else
+					open_journal(arg)
+				end
+			end	
+		end
+	end
+end
+
+
+s = WordSafe.new
+# s.print_title
+s.readArgs
