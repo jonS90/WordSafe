@@ -44,7 +44,6 @@ $ruby wordsafe --change-editor pyroom
 
 ### to do
 
-- Shred the temporary file when the user is done editing it.
 - Create a robust way for the script to handle its first launch, creating a new configuration file. Either create a usable setup wizard, or avoid requiring any setup.
 - Check to see if there are any problems related to having a different working directory (will it still see the config file?)
 - Only unlink the temporary decrypted file when the user is finished editing and closes the editor. Some editors, like Sublime Text or the "xdg-open" command do not block the thread. Figure out away to appropriately delay unlinking the temporary file so you don't slight these non-blocking editors.

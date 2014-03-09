@@ -14,7 +14,8 @@ class WordSafe
 	PROGRAM_NAME = "WordSafe"
 	DEFAULT_JOURNAL="~/.#{PROGRAM_NAME}/journal"
 	DEFAULT_DECRYPTED_JOURNAL="~/.#{PROGRAM_NAME}/unencrypted_journal.txt"
-	CONFIG_FILE="./config"
+	# CONFIG_FILE="./config"
+	CONFIG_FILE="#{Dir.home}/.wordsafe/config" #TODO user specific?
 	VERSION="some alpha stage"
 	KEYLENGTH = 128
 	@config = ""
@@ -25,7 +26,6 @@ class WordSafe
 
 	def initialize
 		config_init()
-		config_save
 	end
 
 	def set_key(password)
@@ -100,13 +100,17 @@ class WordSafe
 
 
 	def config_init()
+		# ensure directory is there
+		dir = Pathname.new(CONFIG_FILE).dirname
+		Dir.mkdir(dir) unless Dir.exist?(dir)
+
+		# ensure config file is there
 		if (!File.file?(CONFIG_FILE))
 			puts "Creating new configuration file"
 			f = File.open(CONFIG_FILE, "w")
 			f.write("[general]\neditor=gedit");
 			f.close();
 		end
-
 
 		@config = ParseConfig.new(CONFIG_FILE)
 	end
@@ -189,6 +193,19 @@ class WordSafe
 		end
 	end
 
+	def exist!(pathname)
+		if (pathname.directory?)
+			raise ArgumentError, "This is a directory: \"#{pathname}\""
+		end
+
+		if (!pathname.exist?)
+			raise IOError, "File does not exist: \"#{pathname}\""
+		end
+
+		if (!pathname.readable?)
+			raise IOError, "File cannot be read: \"#{pathname}\""
+		end
+	end
 
 	def new_journal(path_str)
 		get_password
@@ -223,21 +240,6 @@ class WordSafe
 		end
 	end
 
-
-	def exist!(pathname)
-		if (pathname.directory?)
-			raise ArgumentError, "This is a directory: \"#{arg}\""
-		end
-
-		if (!pathname.exist?)
-			raise IOError, "File does not exist: \"#{arg}\""
-		end
-
-		if (!pathname.readable?)
-			raise IOError, "File cannot be read: \"#{arg}\""
-		end
-	end
-
 	def open_journal(path_str)
 		have_key
 		have_editor
@@ -245,19 +247,33 @@ class WordSafe
 		journal = Pathname.new(path_str)
 		exist!(journal)
 
-
 		decrypted_journal = Tempfile.new('decrypted_journal')
-		clear_console
+		# clear_console
 
 		decrypted_journal.write(decrypt File.read(journal))
 		decrypted_journal.close
 
-		puts "#{@editor} #{decrypted_journal.path}"
-		system "#{@editor} #{decrypted_journal.path}"
+		                puts "#{@editor} #{decrypted_journal.path}"
+		exit_status = system "#{@editor} #{decrypted_journal.path}"
+		if (exit_status != true)
+			puts "Your editor might be invalid."
+		end
 
 
+		puts
+		print "press enter to re-encrypt and shred evidence"
+		$stdin.gets.chomp
 		
+		plaintext = File.read(decrypted_journal)
+		journal = File.open(path_str, "w")
+		journal.write(encrypt plaintext)
+		journal.close()
+
+
+		`shred #{decrypted_journal.path}`
 		decrypted_journal.unlink
+		clear_console
+		puts "file re-encrypted"
 	end
 
 	def change_password (path_str)
