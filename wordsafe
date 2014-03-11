@@ -156,18 +156,9 @@ class WordSafe
 
 	def new_empty_journal(path) 
 		key!
-
-		# plain = new Tempfile.new('emptyjournal')
-		# plain.write("Welcome to your new journal")
-		# plain.close
-		# plain.unlink
-
 		encrypted = File.open(path, "w")
 		encrypted.write( encrypt "Welcome to your new journal" )
 		encrypted.close
-
-
-
 	end
 
 	def get_password()
