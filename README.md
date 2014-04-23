@@ -20,12 +20,12 @@ This is made on Ubuntu, using Ruby 2.1.0.
 Creating files
 
 ```bash
-$ruby wordsafe --new ~/Desktop/
+$ ruby wordsafe --new ~/Desktop/
 # creates a text file (encrypted, of course)
 ```
 
 ```bash
-$ruby wordsafe --new ~/Desktop/journal.txt
+$ ruby wordsafe --new ~/Desktop/journal.txt
 # if "journal.txt" exists, encrypts it as "journal.txt.wordsafe"
 # if "journal.txt" does not exist, creates it (encrypted, of course)
 ```
@@ -33,12 +33,12 @@ $ruby wordsafe --new ~/Desktop/journal.txt
 Opening files
 
 ```bash
-$ruby wordsafe ~/Desktop/journal.txt.wordsafe
+$ ruby wordsafe ~/Desktop/journal.txt.wordsafe
 # decrypts and opens file in your preffered text editor. Re-encrypts after you close the editor.
 ```
 
 ```bash
-$ruby wordsafe --change-editor pyroom
+$ ruby wordsafe --change-editor pyroom
 # use "pyroom" as your text-editor of choice from here on out
 ```
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-#what does this even do?
+#allow unix to automatically identify this as a ruby script
 
 # (c) Jon Smithers 2014
 
@@ -11,15 +11,13 @@ require 'parseconfig'
 require 'openssl'
 
 class WordSafe
-	PROGRAM_NAME = "WordSafe"
-	DEFAULT_JOURNAL="~/.#{PROGRAM_NAME}/journal"
-	DEFAULT_DECRYPTED_JOURNAL="~/.#{PROGRAM_NAME}/unencrypted_journal.txt"
+	PROGRAM_NAME = "WordSafe" 
+	KEYLENGTH = 128 
 	# CONFIG_FILE="./config"
 	CONFIG_FILE="#{Dir.home}/.wordsafe/config" #TODO user specific?
 	VERSION="some alpha stage"
-	KEYLENGTH = 128
 	@config = ""
-	@cipher = OpenSSL::Cipher::AES.new(128, :CBC)
+	@cipher = OpenSSL::Cipher::AES.new(KEYLENGTH, :CBC)
 	@key = ""
 	@editor = ""
 	# key = OpenSSL::PKCS5::pbkdf2_hmac(password, "salt", 5, KEYLENGTH, (OpenSSL::Digest::SHA1.new))
