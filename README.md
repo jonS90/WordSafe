@@ -20,12 +20,12 @@ This is made on Ubuntu, using Ruby 2.1.0.
 Working with journals
 ```bash
 $ ./wordsafe --new myjournalname
-# creates an encrypted template file
+# initializes an encrypted journal in ~/.wordsafe
 ```
 
 ```bash
 $ ./wordsafe myjournalname
-# decrypts and opens file in your preffered text editor. Re-encrypts after you close the editor.
+# decrypts and opens journal in your preffered text editor. Re-encrypts after you close the editor.
 ```
 
 ```bash
@@ -42,17 +42,17 @@ Specifying full filepaths
 
 ```bash
 $ ./wordsafe --file --new ~/Desktop/
-# creates an encrypted template file
-```
-
-```bash
+# initializes an encrypted journal called "journal"
 $ ./wordsafe --file --new ~/Desktop/journal.txt
 # if "journal.txt" exists, encrypts it as "journal.txt.wordsafe"
 # if "journal.txt" does not exist, creates it (encrypted, of course)
 ```
 
+```bash
+$ ./wordsafe --file ~/Desktop/journal
+# decrypts and opens file in your prefferred text editor. Re-encrypts after you close the editor.
+```
 
 ### to do
 
-- Test the robustness of this program's first launch (when there's no configuration file or app directory). Either create a usable setup wizard, or avoid requiring any setup.
-
+- Make this robust to files that aren't pure text. 
