@@ -9,22 +9,25 @@ require 'tempfile'
 require 'io/console'
 require 'parseconfig'
 require 'openssl'
+require 'fileutils'
 
 class WordSafe
 	PROGRAM_NAME = "WordSafe" 
 	KEYLENGTH = 128 
 	# CONFIG_FILE="./config"
-	CONFIG_FILE="#{Dir.home}/.wordsafe/config" #TODO user specific?
+	CONFIG_FILE="#{Dir.home}/.wordsafe/config" #TODO ru specific?
 	VERSION="some alpha stage"
 	@config = ""
 	@cipher = OpenSSL::Cipher::AES.new(KEYLENGTH, :CBC)
 	@key = ""
 	@editor = ""
-	@backupdir = '~/.wordsafe/'
+	@backup_dir = ''
+	@do_backup = false
 	# key = OpenSSL::PKCS5::pbkdf2_hmac(password, "salt", 5, KEYLENGTH, (OpenSSL::Digest::SHA1.new))
 
 	def initialize
 		config_init()
+		@backup_dir = "#{File.expand_path('~')}/.wordsafe/"
 	end
 
 	def set_key(password)
@@ -86,9 +89,7 @@ class WordSafe
 	    --new		     Runs a wizard to create a new encrypted journal with a new password
 	-e, --editor <cmd>           Use specified editor just this once
 	-E, --change-editor <cmd>    Use specified editor from here on out
-	-P, --change-password <file> Change the encryption passphrase for specified file
-	    --restore-backup <file>  Enter wizard to restore previous version of file
-	    --stfu                   Skip the grandios title display when launched"
+	-P, --change-password <file> Change the encryption passphrase for specified file"
 	end
 
 # 	-f, --file     Edit encrypted file (or backup)
@@ -234,12 +235,18 @@ class WordSafe
 		end
 	end
 
+	# This assumes that backupdir already exists?
 	def backup_journal(path_str)
-		time = Time.new
-		timestamp = "#{time.year}#{time.day}#{time.hour}#{time.min}#{time.sec}"
+		if @do_backup
+			time = Time.new
+			timestamp = "#{time.year}#{time.day}#{time.hour}#{time.min}#{time.sec}"
 
+			dir, base = File.split(path_str) 
 
-		
+			puts path_str
+			puts "#{@backup_dir}/#{timestamp} #{base}"
+			FileUtils.cp(path_str, "#{@backup_dir}/#{timestamp} #{base}")
+		end
 	end
 
 	def open_journal(path_str)
@@ -266,11 +273,12 @@ class WordSafe
 		print "press enter to re-encrypt and shred evidence"
 		$stdin.gets.chomp
 		
+		backup_journal(path_str)
+
 		plaintext = File.read(decrypted_journal)
 		journal = File.open(path_str, "w")
 		journal.write(encrypt plaintext)
 		journal.close()
-
 
 		`shred #{decrypted_journal.path}`
 		decrypted_journal.unlink
@@ -303,6 +311,8 @@ class WordSafe
 		while (ARGV.size != 0) do
 			arg = ARGV.shift()
 		  	case arg
+		  	when "-b", "--backup"
+		  		@do_backup = true
 			when "-h", "--help"
 				print_help
 				exit
