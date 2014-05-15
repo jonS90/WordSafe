@@ -1,4 +1,4 @@
-# WordSafe
+g# WordSafe
 
     `7MMF'     A     `7MF'                  `7MM   .M"""bgd            .d' ""      
       `MA     ,MA     ,V                      MM  ,MI    "Y            dM`         
@@ -17,7 +17,7 @@ This is made on Ubuntu, using Ruby 2.1.0.
 
 ### usage
 
-Creating journals
+Working with journals
 ```bash
 $ ./wordsafe --new myjournalname
 # creates an encrypted template file
