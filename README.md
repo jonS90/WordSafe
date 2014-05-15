@@ -1,4 +1,4 @@
-g# WordSafe
+### WordSafe
 
     `7MMF'     A     `7MF'                  `7MM   .M"""bgd            .d' ""      
       `MA     ,MA     ,V                      MM  ,MI    "Y            dM`         
