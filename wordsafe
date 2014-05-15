@@ -22,12 +22,15 @@ class WordSafe
 	@key = ""
 	@editor = ""
 	@backup_dir = ''
+	@shelf_dir = ''
 	@do_backup = false
+	@accept_fullpath = false
 	# key = OpenSSL::PKCS5::pbkdf2_hmac(password, "salt", 5, KEYLENGTH, (OpenSSL::Digest::SHA1.new))
 
 	def initialize
 		config_init()
 		@backup_dir = "#{File.expand_path('~')}/.wordsafe/"
+		@shelf_dir =  "#{File.expand_path('~')}/.wordsafe/"
 	end
 
 	def set_key(password)
@@ -303,6 +306,14 @@ class WordSafe
 		puts "changed password"
 	end
 
+	def change_path(file_str)
+		if @accept_fullpath
+			return "#{file_str}"
+		else
+			return "#{@shelf_dir}/#{file_str}"
+		end
+	end
+
 	def readArgs
 		if (ARGV.size == 0)
 			puts "I have nothing to do"
@@ -313,6 +324,8 @@ class WordSafe
 		  	case arg
 		  	when "-b", "--backup"
 		  		@do_backup = true
+		  	when "-f", "--file"
+		  		@accept_fullpath = true
 			when "-h", "--help"
 				print_help
 				exit
@@ -327,7 +340,8 @@ class WordSafe
 					raise ArgumentError, "Must specify a path for #{arg} tag"
 				end
 				arg = ARGV.shift()
-				new_journal arg
+				file = change_path(arg)
+				new_journal file
 				exit
 			when "-e", "--editor"
 				if (ARGV.size == 0)
@@ -346,7 +360,8 @@ class WordSafe
 					raise ArgumentError, "Must specify a path for #{arg} tag"
 				end
 				arg = ARGV.shift
-				change_password(arg)
+				file = change_path(arg)
+				change_password(file)
 			when "--open-config"
 				puts "xdg-open #{CONFIG_FILE}"
 				`xdg-open #{CONFIG_FILE}`
@@ -355,7 +370,8 @@ class WordSafe
 				if ((arg.each_char.to_a)[0] === "-")
 					raise ArgumentError, "Unrecognized flag \"#{arg}\""
 				else
-					open_journal(arg)
+					file = change_path(arg)
+					open_journal(file)
 				end
 			end	
 		end
