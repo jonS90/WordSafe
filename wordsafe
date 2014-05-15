@@ -1,146 +1,384 @@
-# Journal
-# This script manages the encryption for a journal.
-# Run this script with "bash", not "sh"
-#
-# (c) Jonathan Smithers 2013
-# jonathansmithers.com
+#!/usr/bin/env ruby
+#The previous comment allows unix to automatically identify this as a ruby script
+
+# (c) Jon Smithers 2014
+
+
+require 'pathname'
+require 'tempfile'
+require 'io/console'
+require 'parseconfig'
+require 'openssl'
+require 'fileutils'
+
+class WordSafe
+	PROGRAM_NAME = "WordSafe" 
+	KEYLENGTH = 128 
+	# CONFIG_FILE="./config"
+	CONFIG_FILE="#{Dir.home}/.wordsafe/config" #TODO ru specific?
+	VERSION="0.5"
+	@config = ""
+	@cipher = OpenSSL::Cipher::AES.new(KEYLENGTH, :CBC)
+	@key = ""
+	@editor = ""
+	@backup_dir = ''
+	@shelf_dir = ''
+	@do_backup = false
+	@accept_fullpath = false
+	# key = OpenSSL::PKCS5::pbkdf2_hmac(password, "salt", 5, KEYLENGTH, (OpenSSL::Digest::SHA1.new))
+
+	def initialize
+		config_init()
+		@backup_dir = "#{File.expand_path('~')}/.wordsafe/"
+		@shelf_dir =  "#{File.expand_path('~')}/.wordsafe/"
+	end
+
+	def set_key(password)
+		@key = OpenSSL::PKCS5::pbkdf2_hmac(password, "salt", 5, KEYLENGTH, (OpenSSL::Digest::SHA1.new))
+	end
+
+	def key!()
+		if (@key == "")
+			raise RuntimeError, "key not set"
+		end
+	end
+
+	def encrypt(plaintext) 
+		key!
+		cipher = OpenSSL::Cipher.new("AES-#{KEYLENGTH}-CBC")
+		cipher.encrypt
+		cipher.key = @key
+		cipher.update(plaintext) + cipher.final
+	end
+
+	def decrypt(ciphertext)
+		key!
+		decipher = OpenSSL::Cipher.new("AES-#{KEYLENGTH}-CBC")
+		decipher.decrypt
+		decipher.key = @key
+		decipher.update(ciphertext) + decipher.final
+	end
 
 
 
 
-# CONFIGURABLE VARIABLES
-editor="xdg-open" #terminal command for your editor of choice
+	# Prints sort of a title or splash screen to the terminal
+	def print_title
+		puts
+		puts "\`7MMF'     A     \`7MF'                  \`7MM   .M\"\"\"bgd            .d' \"\"      "
+		puts "  \`MA     ,MA     ,V                      MM  ,MI    \"Y            dM\`         "
+		puts "   VM:   ,VVM:   ,V ,pW\"Wq.\`7Mb,od8  ,M\"\"bMM  \`MMb.      ,6\"Yb.   mMMmm.gP\"Ya  "
+		puts "    MM.  M' MM.  M'6W'   \`Wb MM' \"',AP    MM    \`YMMNq. 8)   MM    MM ,M'   Yb "
+		puts "    \`MM A'  \`MM A' 8M     M8 MM    8MI    MM  .     \`MM  ,pm9MM    MM 8M\"\"\"\"\"\" "
+		puts "     :MM;    :MM;  YA.   ,A9 MM    \`Mb    MM  Mb     dM 8M   MM    MM YM.    , "
+		puts "      VF      VF    \`Ybmd9'.JMML.   \`Wbmd\"MML.P\"Ybmmd\"  \`Moo9^Yo..JMML.\`Mbmmd' "
+		puts
+		puts
+	end
 
-backup_path="./.journal_backups"
-backup_name=`date +"%Y%m%d%H%M"`_journal_backup
-encryptedjournal_name="$USER's journal.gpg"
-encryptedjournal_path="./"
+	# Prints help
+	def print_help
+		puts "WordSafe - version #{VERSION}
+			
+	usage: wordsafe [switches] [encrypted_journal]
+				(to edit encrypted file)
+	   or: wordsafe [switches]
+	   			(to configure persistent settings)
 
+	switches:
+	-h, --help                   Print some help and exit
+	-v, --version                Print version and exit                                           #finalize
+	    --new		             Runs a wizard to create a new encrypted journal with a new password
+	-f, --file                   Specify an encrypted journal by its full filepath
+	-e, --editor <cmd>           Use specified editor just this once
+	-E, --change-editor <cmd>    Use specified editor from here on out
+	-P, --change-password <file> Change the encryption passphrase for specified file"
+	end
 
-echo "        __   __   _      __  _    __   __"
-echo "| /| / /  / /_/  / \    /_  /_|  /_   /_ "
-echo "|/ |/ /__/ / \  /__/   __/ /  | /    /__ "
-echo
-echo
+# 	-f, --file     Edit encrypted file (or backup)
+#   -b, --backup   Before updating, backup journal to .wordsafe directory with the name "{timestamp}_{filename}.wordsafe"
+# 	
 
-
-
-# NONCONFIGURABLE VARIABLES
-decryptedjournal_fullpath="./$USER's unencrypted journal"
-encryptedjournal_fullpath="$encryptedjournal_path/$encryptedjournal_name"
-backup_fullpath="$backup_path/$backup_name"
-
-# VALIDATE VARIABLES
-	# does encrypted file exist?
-	if [ ! -e "$encryptedjournal_fullpath" ]  ;then
-		echo "Press enter to create an empty journal with a new password"
-		read
-		tempfile="./temporary_file_(your_brand_new_unencrypted_journal)"
-		echo "This is your journal. I made this for you <3" > $tempfile
-		echo -e "\n" >> $tempfile
-		echo "Tip: To use a different editor, open up the bash file and modify the line starting with \"editor=\"" >> $tempfile
-		echo -e "\n" >> $tempfile
-		echo "Let's see, today's date is..." >> $tempfile
-		echo $pass | gpg --output "$encryptedjournal_fullpath" -c "$tempfile"
-		rm "$tempfile"
-		if [ -e "$encryptedjournal_fullpath" ]  ;then
-			echo "Excellent! Restart this program to start journalling."
-			exit 0
-		fi
-		echo "Seems there was a problem. You'll have to try again."
-		exit 1
-	fi
-
-	# does backup folder exist?
-	if [ ! -e "$backup_path" ] ;then
-		mkdir --parents --verbose "$backup_path"
-	fi
-
-# BACKUP
-	timestamp=`date +"%Y%m%d%H%M"`
-	cp "$encryptedjournal_fullpath" "$backup_fullpath"
-
-# GET PASSWORD
-	#prompt for password (in a very fancy way)
-			prompt="Password: "
-			while IFS= read -p "$prompt" -r -s -n 1 char
-			do
-			    if [[ $char == $'\0' ]]
-			    then
-			        break
-			    fi
-			    prompt='*'
-			    pass+="$char"
-			done	
-			echo
-	#http://stackoverflow.com/questions/1923435/how-do-i-echo-stars-when-reading-password-with-read
-
-	#an alternative, simple way to get a password
-			# echo -n "Password: "
-			#read -s pass
-
-# DECRYPT
-	# gpg thoughts.gpg
-	# gpg --passphrase "hey" thoughts.gpg
-	echo $pass | gpg --passphrase-fd 0 --output "$decryptedjournal_fullpath" "$encryptedjournal_fullpath"
-	#http://unix.stackexchange.com/questions/60213/gpg-asks-for-password-even-with-passphrase/68726#68726
-	#Specifying 0 causes --passphrase-fd to read from STDIN rather than a file. So, piping the passphrase will get --passphrase-fd to accept your specified string. 
-
-	if [ ! -e "$decryptedjournal_fullpath" ] ;then
-		# clear
-		echo "Failed to decrypt."
-		# echo
-		exit 1
-	fi
-
-	echo "Unencrypted file \"$decryptedjournal_fullpath\" has been created."
-
-# APPEND DATE TO FILE
-	echo -e "\n" >> "$decryptedjournal_fullpath" 
-	date +"%Y%m%d%H%M" >> "$decryptedjournal_fullpath"
-
-# OPEN FILE
-	#echo -n "Press ENTER to open "
-	#read input
-	clear
-	echo "$editor \"$decryptedjournal_fullpath\""
-	$editor "$decryptedjournal_fullpath"
+	def clear_console()
+		system "clear" unless system "cls"
+		# http://stackoverflow.com/questions/3170553/how-can-i-clear-the-terminal-in-ruby
+		# I think this is cross-platform
+	end
 
 
-echo -n "Would you like to save your file, $USER? (Y/n) "
+	def config_init()
+		# ensure directory is there
+		dir = Pathname.new(CONFIG_FILE).dirname
+		Dir.mkdir(dir) unless Dir.exist?(dir)
+
+		# ensure config file is there
+		if (!File.file?(CONFIG_FILE))
+			puts "Creating new configuration file"
+			f = File.open(CONFIG_FILE, "w")
+			f.write("[general]\neditor=gedit");
+			f.close();
+		end
+
+		@config = ParseConfig.new(CONFIG_FILE)
+	end
+
+	def config_save()
+		file = File.open(CONFIG_FILE,'w')
+		@config.write(file)
+		file.close
+	end
+
+	def setup_wizard()
+		raise "This is not supported yet"
+		puts 'This is the setup wizard'
+
+		user = 'echo $USER'
+		tempfile = "temporary_file_asdfhjklasdfhjklasdfhjkl"
+		File.open(tempfile, "w") {|f| f.write("Hello human. If you're reading this, your editor should do just fine!")}
+
+		exit_status = false
+		while (!exit_status) do
+			puts "Please enter the command corresponding to your text-editor of choice."
+			puts "Some examples are \"gedit\", \"pyroom\", and \"vim\""
+			print "> "
+			editor = $stdin.gets.chomp
+			clear_console
+			puts "I must verify that '#{editor}' will work. When it launches, please do the following:"
+			puts "   1. Verify that your editor opened an existing file, NOT A BLANK DOCUMENT."
+			puts "   2. Close the program to continue this setup wizard."
+			puts "Press enter now"
+			gets
+			
+			puts "#{editor} #{tempfile}"
+			exit_status = system "#{editor} #{tempfile}"
 
 
-while :
-do
-	read in
-	if [ "$in" == "Y" ]
-	then
-		echo $pass | gpg -c --passphrase-fd 0 --batch --yes --output "$encryptedjournal_fullpath" "$decryptedjournal_fullpath"
-		#gpg -c --passphrase $pass --batch --yes thoughts
-		#     ^encrypt    ^pass      ^overwrite
-		echo
-		echo -n "Press enter to shred unencrypted version. "
-		read in
-		if [ -n $in ] ; then
-			shred --remove "$decryptedjournal_fullpath"
-		fi
-		echo 'DONE'
-		exit 0
-		
-	elif [ "$in" = "n" ] 
-	then
-		echo -n "Press enter to shred unencrypted version. "
-		read input
-		if [ ! -n "$input" ] ; then
-			shred --remove "$decryptedjournal_fullpath"
-			exit 0
+			if (exit_status != true)
+				puts "bad editor!"
+			end
+		end 
+
+		@config["general"]["editor"] = editor
+	end
+
+	def new_empty_journal(path) 
+		key!
+		encrypted = File.open(path, "w")
+		encrypted.write( encrypt "Welcome to your new journal" )
+		encrypted.close
+	end
+
+	def get_password()
+		print "password: "
+		password = STDIN.noecho(&:gets).chomp
+		puts "unicorns"
+		set_key(password)
+	end
+
+	def have_key
+		if (@key.nil? || @key.empty?) #nil? seems necessary, even though I have no idea how "" turns into nil. 
+			get_password
+		end
+	end
+
+	def have_editor
+		if (defined?(@editor)).nil? || @editor.empty?
+			@editor = @config["general"]["editor"]
+		end
+		if (defined?(@editor)).nil? || @editor.empty?
+			puts "Defaulting editor to xdg-open"
+			editor = "xdg-open"
+		end
+	end
+
+	def exist!(pathname)
+		if (pathname.directory?)
+			raise ArgumentError, "This is a directory: \"#{pathname}\""
+		end
+
+		if (!pathname.exist?)
+			raise IOError, "File does not exist: \"#{pathname}\""
+		end
+
+		if (!pathname.readable?)
+			raise IOError, "File cannot be read: \"#{pathname}\""
+		end
+	end
+
+	def new_journal(path_str)
+		get_password
+
+		path = Pathname.new(path_str)
+		if (path.directory?)
+			path = Pathname.new(path.realpath + "journal")
+			
+			if (path.exist?)
+				raise ArgumentError, ("\"" + path.to_s + "\" already exists")
+			end
+			
+			new_empty_journal path
+			puts "journal created at \"#{path.to_s}\""
 		else
-			clear
-			echo "File remains."
-			echo
-			exit 1
-		fi
-	else
-		echo -n "(Y/n) "
-	fi
-done
+			if (path.exist?)
+				plaintext = File.read(path.realpath)
+
+				newpath = Pathname.new(path.to_s + ".wordsafe")
+				if (newpath.exist?)
+					raise ArgumentError, ("\"" + newpath.to_s + "\" already exists")
+				end
+				encrypted = File.open(newpath, "w")
+				encrypted.write(encrypt plaintext)
+				encrypted.close
+
+				puts "\"" + path.to_s + "\" encrypted to \"" + newpath.to_s
+			else
+				new_empty_journal path
+				puts "journal created at \"#{path.to_s}\""
+			end
+		end
+	end
+
+	# This assumes that backupdir already exists?
+	def backup_journal(path_str)
+		if @do_backup
+			time = Time.new
+			timestamp = "#{time.year}#{time.day}#{time.hour}#{time.min}#{time.sec}"
+
+			dir, base = File.split(path_str) 
+
+			puts path_str
+			puts "#{@backup_dir}/#{timestamp} #{base}"
+			FileUtils.cp(path_str, "#{@backup_dir}/#{timestamp} #{base}")
+		end
+	end
+
+	def open_journal(path_str)
+		have_key
+		have_editor
+
+		journal = Pathname.new(path_str)
+		exist!(journal)
+
+		decrypted_journal = Tempfile.new('decrypted_journal')
+		# clear_console
+
+		decrypted_journal.write(decrypt File.read(journal))
+		decrypted_journal.close
+
+		                puts "#{@editor} #{decrypted_journal.path}"
+		exit_status = system "#{@editor} #{decrypted_journal.path}"
+		if (exit_status != true)
+			puts "Your editor might be invalid."
+		end
+
+
+		puts
+		print "press enter to re-encrypt and shred evidence"
+		$stdin.gets.chomp
+		
+		backup_journal(path_str)
+
+		plaintext = File.read(decrypted_journal)
+		journal = File.open(path_str, "w")
+		journal.write(encrypt plaintext)
+		journal.close()
+
+		`shred #{decrypted_journal.path}`
+		decrypted_journal.unlink
+		clear_console
+		puts "file re-encrypted"
+	end
+
+
+	def change_password (path_str)
+		have_key
+		have_editor
+
+		journal = Pathname.new(path_str)
+		exist!(journal)
+
+		plaintext = decrypt File.read(journal)
+
+		get_password
+
+		newF = File.open(journal.to_s, "w")
+		newF.write(encrypt plaintext)
+		puts "changed password"
+	end
+
+	def change_path(file_str)
+		if @accept_fullpath
+			return "#{file_str}"
+		else
+			return "#{@shelf_dir}/#{file_str}"
+		end
+	end
+
+	def readArgs
+		if (ARGV.size == 0)
+			puts "I have nothing to do"
+		end
+
+		while (ARGV.size != 0) do
+			arg = ARGV.shift()
+		  	case arg
+		  	when "-b", "--backup"
+		  		@do_backup = true
+		  	when "-f", "--file"
+		  		@accept_fullpath = true
+			when "-h", "--help"
+				print_help
+				exit
+			when "-v", "--version"
+				puts VERSION
+				exit
+			when "--setup"
+				setup_wizard
+				exit
+			when "--new"
+				if (ARGV.size == 0)
+					raise ArgumentError, "Must specify a path for #{arg} tag"
+				end
+				arg = ARGV.shift()
+				file = change_path(arg)
+				new_journal file
+				exit
+			when "-e", "--editor"
+				if (ARGV.size == 0)
+					raise ArgumentError, "Must specify an argument for #{arg} tag"
+				end
+				@editor = ARGV.shift
+			when "-E", "--change-editor"
+				if (ARGV.size == 0)
+					raise ArgumentError, "Must specify an argument for #{arg} tag"
+				end
+				@editor = ARGV.shift
+				@config["general"]["editor"] = @editor
+				config_save
+			when "-P", "--change-password"
+				if (ARGV.size == 0)
+					raise ArgumentError, "Must specify a path for #{arg} tag"
+				end
+				arg = ARGV.shift
+				file = change_path(arg)
+				change_password(file)
+			when "--open-config"
+				puts "xdg-open #{CONFIG_FILE}"
+				`xdg-open #{CONFIG_FILE}`
+				exit
+			else
+				if ((arg.each_char.to_a)[0] === "-")
+					raise ArgumentError, "Unrecognized flag \"#{arg}\""
+				else
+					file = change_path(arg)
+					open_journal(file)
+				end
+			end	
+		end
+	end
+end
+
+
+s = WordSafe.new
+# s.print_title
+s.readArgs
