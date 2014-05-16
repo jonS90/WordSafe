@@ -56,3 +56,4 @@ $ ./wordsafe --file ~/Desktop/journal
 ### to do
 
 - Make this robust to files that aren't pure text. 
+- Add ability to appened today's date to the end of plaintext file right before opening.
