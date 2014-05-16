@@ -304,6 +304,7 @@ class WordSafe
 
 		get_password
 
+		backup_journal(path_str)
 		newF = File.open(journal.to_s, "w")
 		newF.write(encrypt plaintext)
 		puts "changed password"
