@@ -78,21 +78,24 @@ class WordSafe
 
 	# Prints help
 	def print_help
-		puts "WordSafe - version #{VERSION}
-			
-	usage: wordsafe [switches] [encrypted_journal]
-				(to edit encrypted file)
-	   or: wordsafe [switches]
-	   			(to configure persistent settings)
-
-	switches:
-	-h, --help                   Print some help and exit
-	-v, --version                Print version and exit                                           #finalize
-	    --new		             Runs a wizard to create a new encrypted journal with a new password
-	-f, --file                   Specify an encrypted journal by its full filepath
-	-e, --editor <cmd>           Use specified editor just this once
-	-E, --change-editor <cmd>    Use specified editor from here on out
-	-P, --change-password <file> Change the encryption passphrase for specified file"
+  	puts "WordSafe - version #{VERSION}
+  		
+  USAGE: wordsafe [switches] [encrypted_journal]
+           (to edit encrypted file)
+     or: wordsafe [switches]
+           (to only configure stuff)
+  SWITCHES:
+  -h, --help                   Print some help and exit.
+  -v, --version                Print version and exit.
+      --new <name>             Create a new encrypted journal with a new 
+                               password.
+  -f, --file                   Specify an encrypted journal by its full 
+                               filepath instead of a name.
+  -e, --editor <cmd>           Use specified editor just this once.
+  -E, --change-editor <cmd>    Use specified editor from here on out.
+  -P, --change-password <name> Change the encryption passphrase for specified 
+                               file.
+      --title                  Print cool-looking title."
 	end
 
 # 	-f, --file     Edit encrypted file (or backup)
@@ -366,6 +369,8 @@ class WordSafe
 				puts "xdg-open #{CONFIG_FILE}"
 				`xdg-open #{CONFIG_FILE}`
 				exit
+			when "--title"
+				print_title
 			else
 				if ((arg.each_char.to_a)[0] === "-")
 					raise ArgumentError, "Unrecognized flag \"#{arg}\""
