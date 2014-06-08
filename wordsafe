@@ -25,6 +25,7 @@ class WordSafe
 	@shelf_dir = ''
 	@do_backup = false
 	@accept_fullpath = false
+	@append_date = false
 	# key = OpenSSL::PKCS5::pbkdf2_hmac(password, "salt", 5, KEYLENGTH, (OpenSSL::Digest::SHA1.new))
 
 	def initialize
@@ -91,6 +92,10 @@ class WordSafe
                                password.
   -f, --file                   Specify an encrypted journal by its full 
                                filepath instead of a name.
+  -a, --append-date            Append today's date after decrypting a text
+                               journal.
+  -b, --backup                 Backup old version of journal just before re-
+                               encrypting.
   -e, --editor <cmd>           Use specified editor just this once.
   -E, --change-editor <cmd>    Use specified editor from here on out.
   -P, --change-password <name> Change the encryption passphrase for specified 
@@ -241,17 +246,27 @@ class WordSafe
 		end
 	end
 
+	def get_timestamp()
+		time = Time.new
+		timestamp = "#{time.year}%02d%02d%02d%02d%02d" % [time.month, time.day, time.hour, time.min, time.sec]
+		return timestamp
+	end
+
 	# This assumes that backupdir already exists?
 	def backup_journal(path_str)
 		if @do_backup
-			time = Time.new
-			timestamp = "#{time.year}#{time.day}#{time.hour}#{time.min}#{time.sec}"
-
 			dir, base = File.split(path_str) 
+			FileUtils.cp(path_str, "#{@backup_dir}/#{get_timestamp} #{base}")
 
-			puts path_str
-			puts "#{@backup_dir}/#{timestamp} #{base}"
-			FileUtils.cp(path_str, "#{@backup_dir}/#{timestamp} #{base}")
+			puts "file backed up (at #{@backup_dir}/#{get_timestamp} #{base})"
+		end
+	end
+
+	def append_date(path_str)
+		if @append_date
+			f = File.open(path_str, 'a')
+			f.write("\n" + get_timestamp + "\n")
+			f.close
 		end
 	end
 
@@ -267,6 +282,7 @@ class WordSafe
 
 		decrypted_journal.write(decrypt File.read(journal))
 		decrypted_journal.close
+		append_date(decrypted_journal.path)
 
 		                puts "#{@editor} #{decrypted_journal.path}"
 		exit_status = system "#{@editor} #{decrypted_journal.path}"
@@ -278,6 +294,7 @@ class WordSafe
 		puts
 		print "press enter to re-encrypt and shred evidence"
 		$stdin.gets.chomp
+		clear_console
 		
 		backup_journal(path_str)
 
@@ -288,7 +305,6 @@ class WordSafe
 
 		`shred #{decrypted_journal.path}`
 		decrypted_journal.unlink
-		clear_console
 		puts "file re-encrypted"
 	end
 
@@ -326,6 +342,8 @@ class WordSafe
 		while (ARGV.size != 0) do
 			arg = ARGV.shift()
 		  	case arg
+		  	when "-a", "--append-date"
+		  		@append_date = true
 		  	when "-b", "--backup"
 		  		@do_backup = true
 		  	when "-f", "--file"
