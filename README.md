@@ -53,7 +53,19 @@ $ ./wordsafe --file ~/Desktop/journal
 # decrypts and opens file in your prefferred text editor. Re-encrypts after you close the editor.
 ```
 
+Backing up journals
+```bash
+$ ./wordsafe --backup myjournalname
+# backs up to ~/.wordsafe/{timestamp} {filename}
+```
+
+Automatically append today's date
+```bash
+$ ./wordsafe --append-date myjournalname
+# appends timestamp to decrypted journal before opening
+```
+
+
 ### to do
 
 - Make this robust to files that aren't pure text. 
-- Add ability to appened today's date to the end of plaintext file right before opening.
