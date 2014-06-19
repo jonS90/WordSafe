@@ -1,4 +1,3 @@
-### WordSafe
 
     `7MMF'     A     `7MF'                  `7MM   .M"""bgd            .d' ""      
       `MA     ,MA     ,V                      MM  ,MI    "Y            dM`         
@@ -8,14 +7,17 @@
          :MM;    :MM;  YA.   ,A9 MM    `Mb    MM  Mb     dM 8M   MM    MM YM.    , 
           VF      VF    `Ybmd9'.JMML.   `Wbmd"MML.P"Ybmmd"  `Moo9^Yo..JMML.`Mbmmd' 
 
-WordSafe makes it super-easy to work with encrypted text. You can use your favorite text editor and forget about the complicated encryption process.
-This is made on Ubuntu, using Ruby 2.1.0.
+WordSafe makes it super-easy to store and retrieve bits of encrypted text. You can use your favorite text editor and forget about the encryption process.
 
-### non-standard gems used
+This is made on Ubuntu, using Ruby 2.1.0. OSX compatibility is nigh.
 
-- parseconfig
+### Install now
 
-### usage
+```bash
+$ curl http://jonathansmithers.com/wordsafe/install.sh | sh
+```
+
+### Usage examples
 
 Working with journals
 ```bash
