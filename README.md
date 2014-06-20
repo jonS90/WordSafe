@@ -7,9 +7,9 @@
          :MM;    :MM;  YA.   ,A9 MM    `Mb    MM  Mb     dM 8M   MM    MM YM.    , 
           VF      VF    `Ybmd9'.JMML.   `Wbmd"MML.P"Ybmmd"  `Moo9^Yo..JMML.`Mbmmd' 
 
-WordSafe makes it super-easy to store and retrieve bits of encrypted text. You can use your favorite text editor and forget about the encryption process.
+WordSafe makes it super-easy to store and retrieve bits of encrypted text. You can use your favorite text editor and forget about the encryption process. It's the perfect tool for keeping a secure repository of ideas or journal entries.
 
-This is made on Ubuntu, using Ruby 2.1.0. OSX compatibility is nigh.
+This is made on Ubuntu, using Ruby 2.1.0. Compatible with Linux and Mac.
 
 ### Install now
 
