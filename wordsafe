@@ -62,7 +62,6 @@ class WordSafe
 
 
 
-
 	# Prints sort of a title or splash screen to the terminal
 	def print_title
 		puts
@@ -113,6 +112,13 @@ class WordSafe
 		# I think this is cross-platform
 	end
 
+	def isMac()
+		RUBY_PLATFORM.include? "darwin"
+	end
+	def isLinux()
+		RUBY_PLATFORM.include? "linux"
+	end
+
 
 	def config_init()
 		# ensure directory is there
@@ -123,7 +129,17 @@ class WordSafe
 		if (!File.file?(CONFIG_FILE))
 			puts "Creating new configuration file"
 			f = File.open(CONFIG_FILE, "w")
-			f.write("[general]\neditor=gedit");
+			
+			if isLinux
+				defaulteditor='xdg-open'
+			elsif isMac
+				defaulteditor='open'
+			else
+				defualteditor='open'
+				puts "YOUR OS IS NOT SUPPORTED"
+			end
+
+			f.write("[general]\neditor=#{defaulteditor}");
 			f.close();
 		end
 
@@ -303,7 +319,14 @@ class WordSafe
 		journal.write(encrypt plaintext)
 		journal.close()
 
-		`shred #{decrypted_journal.path}`
+		if isMac
+			`rm -P #{decrypted_journal.path}`
+		elsif isLinux
+			`shred #{decrypted_journal.path}`
+		else
+			puts "YOUR OS IS NOT SUPPORTED"
+		end
+
 		decrypted_journal.unlink
 		puts "file re-encrypted"
 	end
