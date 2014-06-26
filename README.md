@@ -27,7 +27,7 @@ $ ./wordsafe --new myjournalname
 
 ```bash
 $ ./wordsafe myjournalname
-# decrypts and opens journal in your preffered text editor. Re-encrypts after you close the editor.
+# decrypts and opens journal in your prefered text editor. Re-encrypts after you close the editor.
 ```
 
 ```bash
@@ -52,7 +52,7 @@ $ ./wordsafe --file --new ~/Desktop/journal.txt
 
 ```bash
 $ ./wordsafe --file ~/Desktop/journal
-# decrypts and opens file in your prefferred text editor. Re-encrypts after you close the editor.
+# decrypts and opens file in your preferred text editor. Re-encrypts after you close the editor.
 ```
 
 Backing up journals
