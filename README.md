@@ -36,7 +36,7 @@ $ wordsafe --change-password myjournalname
 Configuring
 
 ```bash
-$ ruby wordsafe --change-editor pyroom
+$ wordsafe --change-editor pyroom
 # use "pyroom" as your text-editor of choice from here on out
 ```
 
