@@ -310,7 +310,7 @@ class WordSafe
 		puts
 		print "press enter to re-encrypt and shred evidence"
 		$stdin.gets.chomp
-		clear_console
+		# clear_console
 		
 		backup_journal(path_str)
 
