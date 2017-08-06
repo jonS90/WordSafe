@@ -14,7 +14,7 @@ This is made on Ubuntu, using Ruby 2.1.0. Compatible with Linux and Mac.
 ### Install now
 
 ```bash
-$ curl https://dl.dropboxusercontent.com/u/1780553/WordSafe/install.sh | sh
+curl https://raw.githubusercontent.com/jonsmithers/WordSafe/master/install.sh | sh
 ```
 
 ### Usage examples
