@@ -1,0 +1,11 @@
+{
+  "name": "wordsafe",
+  "version": "0.1.0",
+  "description": "Convenient CLI for editing and saving encrypted text",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jon Smithers <mail@jonsmithers.link>",
+  "license": "MIT"
+}
