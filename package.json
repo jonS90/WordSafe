@@ -9,6 +9,7 @@
   "author": "Jon Smithers <mail@jonsmithers.link>",
   "license": "MIT",
   "dependencies": {
+    "inquirer": "^3.2.3",
     "yargs": "^8.0.2"
   }
 }
