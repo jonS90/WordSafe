@@ -1,3 +1,4 @@
+const inquirer = require('inquirer');
 module.exports = {
   command: 'init [file]',
   describe: 'Set up a new encrypted text file',
@@ -8,9 +9,12 @@ module.exports = {
     });
   },
   handler(argv) {
-    console.log('HANDLER !!!!');
-    console.log(argv);
-    console.debug('handler()');
-    console.log('%chandler()', 'font-size:15px');
+    inquirer.prompt([
+      {
+        type: 'password',
+        message: 'Encryption password',
+        name: 'thepassword'
+      }
+    ]).then(console.log);
   }
 };

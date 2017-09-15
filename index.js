@@ -1,5 +1,4 @@
 #!/usr/local/bin/node
-const inquirer = require('inquirer');
 var encryption = require('./encryption.js');
 
 require('yargs')
@@ -21,7 +20,3 @@ require('yargs')
     .alias('h', 'help')
     .epilog('Copyright 2017')
     .argv;
-// require('yargs')
-// .command('init', 'setup new encrypted text')
-
-// setInterval(() => {}, 1000)
