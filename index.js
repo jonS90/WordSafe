@@ -8,17 +8,9 @@ require('yargs')
       encryption.encrypt(argv.file, argv.output, 'my password');
     })
     .command('decrypt <file> <output>', 'testing', console.log, argv => {
-      console.log('HELLO');
       encryption.decrypt(argv.file, argv.output, 'my password');
     })
-    .command('init <file>', 'Set up a new encrypted text file',
-      yargs => yargs.option('specificToInit', {
-        describe: 'this option is specific to init'
-      }).example('$0 init my_journal', 'Creates encrypted file my_journal'),
-      argv => {
-        console.log("this is where we handle it", argv.file);
-      }
-    )
+    .command(require('./commands/init.js'))
     .command('*', 'wut', ()=>{}, ()=>{ console.error('unrecognized'); })
     .option('v', {
       alias: 'verbose',
