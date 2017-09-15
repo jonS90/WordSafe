@@ -9,12 +9,28 @@ module.exports = {
     });
   },
   handler(argv) {
-    inquirer.prompt([
+    var questions = [
       {
+        name: 'password',
         type: 'password',
         message: 'Encryption password',
-        name: 'thepassword'
       }
-    ]).then(console.log);
+    ];
+    if (!argv.file) {
+      questions = [
+        {
+          name: 'file',
+          type: 'input',
+          default: 'encrypted_file',
+          message: 'Name of new encrypted file'
+        },
+        ...questions
+      ];
+    }
+    inquirer.prompt(questions).then(userinputs => {
+      var password = userinputs.password;
+      var file = argv.file || userinputs.file;
+      console.log('file', file);
+    });
   }
 };
