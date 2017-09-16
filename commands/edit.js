@@ -3,9 +3,9 @@ const encryption    = require('../encryption.js');
 const fs            = require('fs');
 const tmp           = require('tmp');
 const child_process = require('child_process');
-const exec          = require('child_process').exec;
 
 tmp.setGracefulCleanup(); // Cleanup temporary files even when an uncaught exception occurs
+// TODO need to call cleanup callback for safety
 
 module.exports = {
   command: 'edit <file>',
@@ -28,32 +28,26 @@ module.exports = {
     var tmpFile;
     inquirer.prompt(questions).then(userinputs => {
       tmpFile = tmp.fileSync();
-      fs.createWriteStream(tmpFile.name)
       encryption.streams.decrypt(
         fs.createReadStream(argv.file),
         fs.createWriteStream(tmpFile.name),
         userinputs.password
       ).then(() => {
-        return openEditor(tmpFile.name).catch(console.error);
+        return require('opn')(tmpFile.name);
+        // return openEditor(tmpFile.name).catch(console.error);
       }).then(() => {
         return encryption.streams.encrypt(
           fs.createReadStream(tmpFile.name),
           fs.createWriteStream(argv.file),
           userinputs.password
         );
-      }).catch(console.error);
+      }).catch(e => {
+        tmpFile.removeCallback();
+        console.error(e);
+      });
     });
   }
 };
-
-// function openEditor(filepath) {
-//   return new Promise((resolve, reject) => {
-//     let editor = child_process.exec('nvim', {stdio: 'inherit'}, (error, stdout, sterr) => {
-//       if (error) return reject(error);
-//       resolve();
-//     });
-//   });
-// }
 
 function openEditor(filepath) {
   let editor = 'nvim';
@@ -91,7 +85,7 @@ function openEditor(filepath) {
   ];
   // nvim -c Goyo -c WM -c 'set nofoldenable' + -c 'normal o' -c 'normal o\t' -c 'normal o' -c 'normal o' -c 'normal zt' +startinsert
   return new Promise((resolve, reject) => {
-    let editor = child_process.spawn('nvim', [...editorArgs, filepath], {
+    let editor = child_process.spawn(editor, [...editorArgs, filepath], {
       stdio: 'inherit'
     });
     editor.on('close', resolve);

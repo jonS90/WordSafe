@@ -11,6 +11,7 @@
   "dependencies": {
     "chalk": "^2.1.0",
     "inquirer": "^3.2.3",
+    "opn": "^5.1.0",
     "stream-to-promise": "^2.2.0",
     "tmp": "^0.0.33",
     "yargs": "^8.0.2"
