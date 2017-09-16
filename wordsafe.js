@@ -9,8 +9,8 @@ Usage:
   wordsafe <command> [options]
 
 Description:
-  WordSafe makes it practical to decrypt and re-encrypted a plaintext file that
-  you want to edit on a regular basis, such as, perhaps, an encrypted diary.
+  WordSafe makes it practical to decrypt and re-encrypted a plaintext file on a
+  regular basis.
 `.slice(1,-1);
 
 require('yargs')
