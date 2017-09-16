@@ -3,10 +3,10 @@
 const chalk = require('chalk');
 let usage =
 `
-${chalk.bold('$0')}
+${chalk.bold('wordsafe')}
 
 Usage:
-  $0 <command> [options]
+  wordsafe <command> [options]
 
 Description:
   WordSafe makes it practical to decrypt and re-encrypted a plaintext file that
@@ -27,7 +27,7 @@ require('yargs')
     .boolean('verbose')
     .help()
     .command('*', '', ()=>{}, ()=> {
-      console.error(`you might want to run \n> ${require('yargs').$0} help`);
+      console.error('you might want to run \n> wordsafe help');
       // require('yargs').showHelp();
     })
     // .alias('h', 'help')
