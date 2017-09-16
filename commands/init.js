@@ -1,4 +1,8 @@
-const inquirer = require('inquirer');
+const inquirer   = require('inquirer');
+const encryption = require('../encryption.js');
+const Readable   = require('stream').Readable;
+const fs         = require('fs');
+
 module.exports = {
   command: 'init [file]',
   describe: 'Set up a new encrypted text file',
@@ -28,9 +32,17 @@ module.exports = {
       ];
     }
     inquirer.prompt(questions).then(userinputs => {
+
       var password = userinputs.password;
       var file = argv.file || userinputs.file;
-      console.log('file', file);
+
+      var stringStream = new Readable();
+      stringStream._read = () => {};
+      stringStream.push('Welcome to your encrypted text file :-)\n');
+      //                                                        ^ POSIX
+      stringStream.push(null);
+
+      encryption.streams.encrypt(stringStream, fs.createWriteStream(file), password).catch(console.error);
     });
   }
 };

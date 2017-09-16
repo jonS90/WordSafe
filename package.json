@@ -10,6 +10,7 @@
   "license": "MIT",
   "dependencies": {
     "inquirer": "^3.2.3",
+    "stream-to-promise": "^2.2.0",
     "yargs": "^8.0.2"
   }
 }
