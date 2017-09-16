@@ -6,9 +6,9 @@ module.exports = {
   describe: 'Decrypt file to stdout',
   builder(yargs) {
     yargs.example('hello');
-    yargs.option('specificTo_INIT', {
-      alias: 'x',
-      describe: 'this is specific to the init command'
+    yargs.option('stdin-password', {
+      // alias: 'x',
+      describe: 'Read password from stdin (NOT IMPLEMENTED)'
     });
   },
   handler(argv) {
@@ -21,10 +21,10 @@ module.exports = {
     ];
     inquirer.prompt(questions).then(userinputs => {
       encryption.streams.decrypt(
-      fs.createReadStream(argv.file),
+        fs.createReadStream(argv.file),
         process.stdout,
         userinputs.password
-    ).catch(console.error);
+      ).catch(console.error);
     });
   }
 };
