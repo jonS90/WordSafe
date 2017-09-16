@@ -1,3 +1,5 @@
+This project is unstable, volatile, and subject to much change at any moment.
+
 WordSafe is a simple cammand line interface that makes it quick and easy to
 create, read, and edit encrypted text files.
 
