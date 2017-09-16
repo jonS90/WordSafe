@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "description": "Convenient CLI for editing and saving encrypted text",
   "main": "wordsafe.js",
+  "bin": {
+    "wordsafe": "./wordsafe.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
