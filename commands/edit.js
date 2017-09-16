@@ -1,8 +1,9 @@
-const inquirer      = require('inquirer');
+const child_process = require('child_process');
+const config        = require('../config.js');
 const encryption    = require('../encryption.js');
 const fs            = require('fs');
+const inquirer      = require('inquirer');
 const tmp           = require('tmp');
-const child_process = require('child_process');
 
 tmp.setGracefulCleanup(); // Cleanup temporary files even when an uncaught exception occurs
 // TODO need to call cleanup callback for safety
@@ -33,8 +34,7 @@ module.exports = {
         fs.createWriteStream(tmpFile.name),
         userinputs.password
       ).then(() => {
-        return require('opn')(tmpFile.name);
-        // return openEditor(tmpFile.name).catch(console.error);
+        return config.openEditor(tmpFile.name);
       }).then(() => {
         return encryption.streams.encrypt(
           fs.createReadStream(tmpFile.name),
@@ -48,47 +48,3 @@ module.exports = {
     });
   }
 };
-
-function openEditor(filepath) {
-  let editor = 'nvim';
-  let editorArgs = [
-    '-c Goyo',
-    '-c WM',
-    '-c "set nofoldenable"',
-    '+',
-    '-c "normal o"',
-    '-c "normal o\t"',
-    '-c "normal o"',
-    '-c "normal o"',
-    '-c "normal zt"',
-    '+startinsert'
-  ];
-  editorArgs = [
-    '-c',
-    'Goyo',
-    '-c',
-    'WM',
-    '-c',
-    'set nofoldenable',
-    '+',
-    '-c',
-    'normal o',
-    '-c',
-    'normal o\\t',
-    '-c',
-    'normal o',
-    '-c',
-    'normal o',
-    '-c',
-    'normal zt',
-    '+startinsert'
-  ];
-  // nvim -c Goyo -c WM -c 'set nofoldenable' + -c 'normal o' -c 'normal o\t' -c 'normal o' -c 'normal o' -c 'normal zt' +startinsert
-  return new Promise((resolve, reject) => {
-    let editor = child_process.spawn(editor, [...editorArgs, filepath], {
-      stdio: 'inherit'
-    });
-    editor.on('close', resolve);
-    editor.on('error', reject);
-  });
-}
