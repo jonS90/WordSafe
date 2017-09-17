@@ -28,12 +28,12 @@ module.exports = {
     });
   },
   async handler(argv) {
-    var userinputs = await new yargutils.Prompter().password().prompt();
+    var {password} = await new yargutils.Prompter().password().prompt();
     var tmpFile = tmp.fileSync();
     try {
-      await encryption.filenames.decrypt(argv.file, tmpFile.name, userinputs.password);
+      await encryption.filenames.decrypt(argv.file, tmpFile.name, password);
       await config.openEditor(tmpFile.name, argv);
-      await encryption.filenames.encrypt(tmpFile.name, argv.file, userinputs.password);
+      await encryption.filenames.encrypt(tmpFile.name, argv.file, password);
     } catch(e) {
       console.error(e);
     }
