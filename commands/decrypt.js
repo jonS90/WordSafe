@@ -1,6 +1,7 @@
-const inquirer   = require('inquirer');
 const encryption = require('../encryption.js');
 const fs         = require('fs');
+const yargutils  = require('../utils/yarg-utils.js');
+
 module.exports = {
   command: 'decrypt <file>',
   describe: 'Decrypt file to stdout',
@@ -11,20 +12,12 @@ module.exports = {
       describe: 'Read password from stdin (NOT IMPLEMENTED)'
     });
   },
-  handler(argv) {
-    var questions = [
-      {
-        name: 'password',
-        type: 'password',
-        message: 'Password',
-      }
-    ];
-    inquirer.prompt(questions).then(userinputs => {
-      encryption.streams.decrypt(
-        fs.createReadStream(argv.file),
-        process.stdout,
-        userinputs.password
-      ).catch(console.error);
-    });
+  async handler(argv) {
+    try {
+      var {password} = await new yargutils.Prompter().password().prompt();
+      return await encryption.streams.decrypt(fs.createReadStream(argv.file), process.stdout, password);
+    } catch(e) {
+      console.error(e);
+    }
   }
 };
