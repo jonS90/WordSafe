@@ -32,6 +32,7 @@ require('yargs')
       console.error('you might want to run \n> wordsafe help');
       // require('yargs').showHelp();
     })
+    .example('wordsafe init\nwordsafe edit --editor="vim" <encrypted-file>')
     // .alias('h', 'help')
     // .alias('h', '*')
     .argv;
