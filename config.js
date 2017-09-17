@@ -8,7 +8,11 @@ try {
 } catch(e) { /**/ }
 
 module.exports = Object.assign(config, {
-  openEditor(filepath) {
+  openEditor(filepath, vargs) {
+    if (vargs.editor) {
+      config.editor          = vargs.editor;
+      config.editorArguments = [];
+    }
     if (!config.editor) {
       return require('opn')(filepath);
     } else {

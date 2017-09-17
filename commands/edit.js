@@ -45,7 +45,7 @@ module.exports = {
         fs.createWriteStream(tmpFile.name),
         userinputs.password
       ).then(() => {
-        return config.openEditor(tmpFile.name);
+        return config.openEditor(tmpFile.name, argv);
       }).then(() => {
         return encryption.streams.encrypt(
           fs.createReadStream(tmpFile.name),
