@@ -11,12 +11,19 @@ module.exports = {
   command: 'edit <file>',
   describe: 'Edit encrypted file with editor of your choice',
   builder(yargs) {
-    yargs.option('append-date', {
-      alias: 'd',
+    yargs.string('e');
+    yargs.option('e', {
+      alias: 'editor',
+      describe: '(NOT IMPLEMENTED) Override default/pre-configured editor'
+    });
+    yargs.boolean('d');
+    yargs.option('d', {
+      alias: 'append-date',
       describe: '(NOT IMPLEMENTED) Append today\'s date'
     });
-    yargs.option('stdin-password', {
-      alias: 'x',
+    yargs.boolean('x');
+    yargs.option('x', {
+      alias: 'stdin-password',
       describe: '(NOT IMPLEMENTED) Read password from stdin'
     });
   },
