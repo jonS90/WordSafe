@@ -16,6 +16,14 @@ module.exports = {
     prompt() {
       return inquirer.prompt(this.questions);
     }
+    encryptedFile() {
+      this.questions.push({
+        name: 'file',
+        type: 'input',
+        default: 'encrypted_file',
+        message: 'Name of new encrypted file'
+      });
+    }
     password() {
       this.questions.push({
         name: 'password',
