@@ -23,6 +23,7 @@ module.exports = {
         default: 'encrypted_file',
         message: 'Name of new encrypted file'
       });
+      return this;
     }
     password() {
       this.questions.push({
@@ -30,6 +31,7 @@ module.exports = {
         type: 'password',
         message: 'Password',
       });
+      return this;
     }
   },
 };

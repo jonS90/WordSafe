@@ -1,4 +1,3 @@
-const inquirer   = require('inquirer');
 const encryption = require('../encryption.js');
 const Readable   = require('stream').Readable;
 const fs         = require('fs');
