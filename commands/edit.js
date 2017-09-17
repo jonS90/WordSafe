@@ -1,8 +1,9 @@
-const config        = require('../config.js');
-const encryption    = require('../encryption.js');
-const fs            = require('fs');
-const inquirer      = require('inquirer');
-const tmp           = require('tmp');
+const config     = require('../config.js');
+const encryption = require('../encryption.js');
+const fs         = require('fs');
+const inquirer   = require('inquirer');
+const tmp        = require('tmp');
+const yargutils  = require('../utils/yarg-utils.js');
 
 tmp.setGracefulCleanup(); // Cleanup temporary files even when an uncaught exception occurs
 // TODO need to call cleanup callback for safety
@@ -12,6 +13,7 @@ module.exports = {
   describe: 'Edit encrypted file with editor of your choice',
   builder(yargs) {
     yargs.string('e');
+    yargutils.options.customEditorOption(yargs);
     yargs.option('e', {
       alias: 'editor',
       describe: '(NOT IMPLEMENTED) Override default/pre-configured editor'
