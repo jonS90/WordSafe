@@ -1,6 +1,5 @@
 const config     = require('../config.js');
 const encryption = require('../encryption.js');
-const inquirer   = require('inquirer');
 const tmp        = require('tmp');
 const yargutils  = require('../utils/yarg-utils.js');
 
@@ -29,15 +28,7 @@ module.exports = {
     });
   },
   async handler(argv) {
-    var questions = [
-      {
-        name: 'password',
-        type: 'password',
-        message: 'Password',
-      }
-    ];
-
-    var userinputs = await inquirer.prompt(questions);
+    var userinputs = await new yargutils.Prompter().password().prompt();
     var tmpFile = tmp.fileSync();
     try {
       await encryption.filenames.decrypt(argv.file, tmpFile.name, userinputs.password);
