@@ -1,4 +1,3 @@
-const child_process = require('child_process');
 const config        = require('../config.js');
 const encryption    = require('../encryption.js');
 const fs            = require('fs');
@@ -11,13 +10,16 @@ tmp.setGracefulCleanup(); // Cleanup temporary files even when an uncaught excep
 module.exports = {
   command: 'edit <file>',
   describe: 'Edit encrypted file with editor of your choice',
-  // builder(yargs) {
-  //   yargs.example('hello');
-  //   yargs.option('stdin-password', {
-  //     alias: 'x',
-  //     describe: 'Read password from stdin (NOT IMPLEMENTED)'
-  //   });
-  // },
+  builder(yargs) {
+    yargs.option('append-date', {
+      alias: 'd',
+      describe: '(NOT IMPLEMENTED) Append today\'s date'
+    });
+    yargs.option('stdin-password', {
+      alias: 'x',
+      describe: '(NOT IMPLEMENTED) Read password from stdin'
+    });
+  },
   handler(argv) {
     var questions = [
       {
