@@ -12,10 +12,6 @@ module.exports = {
   builder(yargs) {
     yargs.string('e');
     yargutils.options.customEditorOption(yargs);
-    yargs.option('e', {
-      alias: 'editor',
-      describe: '(NOT IMPLEMENTED) Override default/pre-configured editor'
-    });
     yargs.boolean('d');
     yargs.option('d', {
       alias: 'append-date',
