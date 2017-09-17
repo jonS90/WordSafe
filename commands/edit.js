@@ -1,6 +1,5 @@
 const config     = require('../config.js');
 const encryption = require('../encryption.js');
-const fs         = require('fs');
 const inquirer   = require('inquirer');
 const tmp        = require('tmp');
 const yargutils  = require('../utils/yarg-utils.js');
@@ -29,7 +28,7 @@ module.exports = {
       describe: '(NOT IMPLEMENTED) Read password from stdin'
     });
   },
-  handler(argv) {
+  async handler(argv) {
     var questions = [
       {
         name: 'password',
@@ -37,25 +36,16 @@ module.exports = {
         message: 'Password',
       }
     ];
-    var tmpFile;
-    inquirer.prompt(questions).then(userinputs => {
-      tmpFile = tmp.fileSync();
-      encryption.streams.decrypt(
-        fs.createReadStream(argv.file),
-        fs.createWriteStream(tmpFile.name),
-        userinputs.password
-      ).then(() => {
-        return config.openEditor(tmpFile.name, argv);
-      }).then(() => {
-        return encryption.streams.encrypt(
-          fs.createReadStream(tmpFile.name),
-          fs.createWriteStream(argv.file),
-          userinputs.password
-        );
-      }).catch(e => {
-        tmpFile.removeCallback();
-        console.error(e);
-      });
-    });
+
+    var userinputs = await inquirer.prompt(questions);
+    var tmpFile = tmp.fileSync();
+    try {
+      await encryption.filenames.decrypt(argv.file, tmpFile.name, userinputs.password);
+      await config.openEditor(tmpFile.name, argv);
+      await encryption.filenames.encrypt(tmpFile.name, argv.file, userinputs.password);
+    } catch(e) {
+      console.error(e);
+    }
+    tmpFile.removeCallback();
   }
 };

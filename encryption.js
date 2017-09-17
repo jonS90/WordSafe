@@ -1,6 +1,5 @@
 const crypto          = require('crypto');
 const fs              = require('fs');
-const console         = require('./console-wrapper.js');
 const streamToPromise = require('stream-to-promise');
 
 function promisify(stream) {
@@ -18,7 +17,15 @@ function promisify(stream) {
   });
 }
 
-module.exports = {
+const encryption = {
+  filenames: {
+    decrypt(encryptedFilename, decryptedFilename, password) {
+      return encryption.streams.decrypt(fs.createReadStream(encryptedFilename), fs.createWriteStream(decryptedFilename), password);
+    },
+    encrypt(decryptedFilename, encryptedFilename, password) {
+      return encryption.streams.encrypt(fs.createReadStream(decryptedFilename), fs.createWriteStream(encryptedFilename), password);
+    }
+  },
   streams: {
     encrypt(inputStream, outputStream, password) {
       var cipher = crypto.createCipher('aes192', password);
@@ -56,3 +63,5 @@ module.exports = {
     input.pipe(cipher).pipe(output);
   }
 };
+
+module.exports = encryption;
