@@ -29,8 +29,9 @@ require('yargs')
     .boolean('verbose')
     .help()
     .command('*', '', ()=>{}, ()=> {
-      console.error('you might want to run \n> wordsafe help');
-      // require('yargs').showHelp();
+      // require('yargs').showHelp(); DOESNT WORK FOR DESIRED CONTEXT
+      // re-run wordsafe with "help" command
+      require('child_process').spawn('wordsafe', ['help'], {stdio: 'inherit'});
     })
     .example('wordsafe init\nwordsafe edit --editor="vim" <encrypted-file>')
     // .alias('h', 'help')
