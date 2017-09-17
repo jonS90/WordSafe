@@ -13,6 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "chalk": "^2.1.0",
+    "combined-stream": "^1.0.5",
     "inquirer": "^3.2.3",
     "opn": "^5.1.0",
     "stream-to-promise": "^2.2.0",
