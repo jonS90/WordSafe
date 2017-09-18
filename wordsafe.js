@@ -18,6 +18,7 @@ require('yargs')
   .command(require('./commands/init.js'))
   .command(require('./commands/edit.js'))
   .command(require('./commands/push.js'))
+  .command('read <file>', '(NOT IMPLEMENTED) Open encrypted file in editor, but don\'t save any changes made')
   .command('change-password', '(NOT IMPLEMENTED)')
   .command('change-cipher', '(NOT IMPLEMENTED)')
   .command(require('./commands/decrypt.js'))
@@ -33,7 +34,7 @@ require('yargs')
     // re-run wordsafe with "help" command
     require('child_process').spawn('wordsafe', ['help'], {stdio: 'inherit'});
   })
-  .example('wordsafe init\nwordsafe edit --editor="vim" <encrypted-file>')
+  .example('wordsafe init\nwordsafe edit <encrypted-file> --editor vim')
   // .alias('h', 'help')
   // .alias('h', '*')
   .argv;
