@@ -1,9 +1,9 @@
-const config     = require('../config.js');
-const encryption = require('../encryption.js');
-const fs         = require('fs');
-const tmp        = require('tmp');
-const yargutils  = require('../utils/yarg-utils.js');
 const CombinedStream = require('combined-stream');
+const config         = require('../config.js');
+const encryption     = require('../encryption.js');
+const fs             = require('fs');
+const tmp            = require('tmp');
+const yargutils      = require('../utils/yarg-utils.js');
 
 
 tmp.setGracefulCleanup(); // Cleanup temporary files even when an uncaught exception occurs
@@ -17,8 +17,9 @@ module.exports = {
     yargutils.options.customEditorOption(yargs);
     yargs.boolean('d');
     yargs.option('d', {
-      alias: 'append-date',
-      describe: '(NOT IMPLEMENTED) Append today\'s date'
+      alias: 'insert-date',
+      default: false,
+      describe: 'Insert today\'s date'
     });
     yargs.boolean('x');
     yargs.option('x', {
@@ -39,6 +40,10 @@ module.exports = {
 
       // open empty file
       tmpFileWithNewContent = tmp.fileSync();
+      if (argv['insert-date']) {
+        let dateStr = '\n' + new Date().toDateString() + ' ' + new Date().toLocaleTimeString() + '\n\n\n';
+        fs.writeFileSync(tmpFileWithNewContent.name, dateStr);
+      }
       await config.openEditor(tmpFileWithNewContent.name, argv);
 
       tmpFileForDecryption = tmp.fileSync();
