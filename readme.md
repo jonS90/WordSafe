@@ -14,9 +14,11 @@ This will also upgrade WordSafe if it's already installed.
 
 # Documentation
 
-Wordsafe is self-documented thanks to [yargs](https://www.npmjs.com/package/yargs). Here is its help text:
+WordSafe's help text is dynamically-generated with the
+[yargs](https://www.npmjs.com/package/yargs) npm package:
 
 ```
+$ wordsafe --help
 wordsafe
 
 Usage:
@@ -31,6 +33,10 @@ Commands:
   edit <file>      Edit encrypted file with editor of your choice
   push <file>      Open an empty editor for you to type in and append the
                    contents you type to <file>
+  read <file>      (NOT IMPLEMENTED) Open encrypted file in editor, but don't
+                   save any changes made
+  change-password  (NOT IMPLEMENTED)
+  change-cipher    (NOT IMPLEMENTED)
   decrypt <file>   Decrypt file to stdout
 
 Options:
@@ -39,5 +45,5 @@ Options:
 
 Examples:
   wordsafe init
-  wordsafe edit --editor="vim" <encrypted-file>
+  wordsafe edit <encrypted-file> --editor vim
 ```
