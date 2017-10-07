@@ -2,6 +2,7 @@ const CombinedStream = require('combined-stream');
 const config         = require('../config.js');
 const encryption     = require('../encryption.js');
 const fs             = require('fs');
+const streamUtils    = require('../utils/stream-utils.js');
 const tmp            = require('tmp');
 const yargutils      = require('../utils/yarg-utils.js');
 
@@ -15,11 +16,17 @@ module.exports = {
   builder(yargs) {
     yargs.string('e');
     yargutils.options.customEditorOption(yargs);
+    yargs.boolean('D');
+    yargs.option('D', {
+      alias: 'prepend-date-loudly',
+      default: false,
+      describe: 'Prepend today\'s date before opening editor'
+    });
     yargs.boolean('d');
     yargs.option('d', {
-      alias: 'insert-date',
+      alias: 'prepend-date-quietly',
       default: false,
-      describe: 'Insert today\'s date'
+      describe: 'Prepend today\'s date after editor is closed'
     });
     yargs.boolean('x');
     yargs.option('x', {
@@ -38,11 +45,12 @@ module.exports = {
         tmpFile.removeCallback();
       }
 
+      let dateStr = '\n' + new Date().toDateString() + ' ' + new Date().toLocaleTimeString() + '\n\n';
+
       // open empty file
       tmpFileWithNewContent = tmp.fileSync();
-      if (argv['insert-date']) {
-        let dateStr = '\n' + new Date().toDateString() + ' ' + new Date().toLocaleTimeString() + '\n\n\n';
-        fs.writeFileSync(tmpFileWithNewContent.name, dateStr);
+      if (argv['prepend-date-loudly']) {
+        fs.writeFileSync(tmpFileWithNewContent.name, dateStr + '\n');
       }
       await config.openEditor(tmpFileWithNewContent.name, argv);
 
@@ -51,6 +59,7 @@ module.exports = {
 
       var combinedStream = new CombinedStream();
       combinedStream.append(fs.createReadStream(tmpFileForDecryption.name));
+      if (argv['prepend-date-quietly']) combinedStream.append(streamUtils.fromString(dateStr));
       combinedStream.append(fs.createReadStream(tmpFileWithNewContent.name));
 
       await encryption.streams.encrypt(combinedStream, fs.createWriteStream(argv.file), password);
