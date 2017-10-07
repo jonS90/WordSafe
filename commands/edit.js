@@ -10,7 +10,6 @@ module.exports = {
   command: 'edit <file>',
   describe: 'Edit encrypted file with editor of your choice',
   builder(yargs) {
-    yargs.string('e');
     yargutils.options.customEditorOption(yargs);
     yargs.boolean('d');
     yargs.option('d', {

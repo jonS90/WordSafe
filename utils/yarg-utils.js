@@ -3,6 +3,7 @@ const inquirer = require('inquirer');
 module.exports = {
   options: {
     customEditorOption(yargs) {
+      yargs.string('e');
       yargs.option('e', {
         alias: 'editor',
         describe: 'Override default/pre-configured editor'

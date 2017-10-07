@@ -14,7 +14,6 @@ module.exports = {
   command: 'push <file>',
   describe: 'Open an empty editor for you to type in and append the contents you type to <file>',
   builder(yargs) {
-    yargs.string('e');
     yargutils.options.customEditorOption(yargs);
     yargs.boolean('D');
     yargs.option('D', {
