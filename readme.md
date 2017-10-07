@@ -45,5 +45,5 @@ Options:
 
 Examples:
   wordsafe init
-  wordsafe edit <encrypted-file> --editor vim
+  wordsafe edit <encrypted-file> --editor=vim
 ```
