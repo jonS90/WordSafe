@@ -6,20 +6,10 @@ const yargutils  = require('../utils/yarg-utils.js');
 tmp.setGracefulCleanup(); // Cleanup temporary files even when an uncaught exception occurs
 
 module.exports = {
-  command: 'edit <file>',
-  describe: 'Edit encrypted file with editor of your choice',
+  command: 'read <file>',
+  describe: 'View encrypted file but don\'t save changes',
   builder(yargs) {
     yargutils.options.customEditorOption(yargs);
-    yargs.boolean('d');
-    yargs.option('d', {
-      alias: 'append-date',
-      describe: '(NOT IMPLEMENTED) Append today\'s date'
-    });
-    yargs.boolean('x');
-    yargs.option('x', {
-      alias: 'stdin-password',
-      describe: '(NOT IMPLEMENTED) Read password from stdin'
-    });
   },
   async handler(argv) {
     var {password} = await new yargutils.Prompter().password().prompt();
@@ -27,7 +17,6 @@ module.exports = {
     try {
       await encryption.filenames.decrypt(argv.file, tmpFile.name, password);
       await config.openEditor(tmpFile.name, argv);
-      await encryption.filenames.encrypt(tmpFile.name, argv.file, password);
     } catch(e) {
       console.error(e);
     }
