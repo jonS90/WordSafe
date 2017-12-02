@@ -34,7 +34,7 @@ require('yargs')
     // re-run wordsafe with "help" command
     require('child_process').spawn('wordsafe', ['help'], {stdio: 'inherit'});
   })
-  .example('wordsafe init\nwordsafe edit <encrypted-file> --editor=vim')
+  .example('wordsafe init encrypted-file\nwordsafe edit encrypted-file --editor=vim')
   // .alias('h', 'help')
   // .alias('h', '*')
   .argv;
