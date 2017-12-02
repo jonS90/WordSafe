@@ -33,8 +33,7 @@ Commands:
   edit <file>      Edit encrypted file with editor of your choice
   push <file>      Open an empty editor for you to type in and append the
                    contents you type to <file>
-  read <file>      (NOT IMPLEMENTED) Open encrypted file in editor, but don't
-                   save any changes made
+  read <file>      View encrypted file but don't save changes
   change-password  (NOT IMPLEMENTED)
   change-cipher    (NOT IMPLEMENTED)
   decrypt <file>   Decrypt file to stdout
