@@ -1,8 +1,5 @@
-WordSafe is a simple cammand line utility that makes it quick and easy to
+WordSafe is a simple command line utility that makes it quick and easy to
 create, read, and edit encrypted text files.
-
-**Caution**: This project is currently unstable, volatile, and subject to much change at any
-moment.
 
 # Install
 
@@ -43,6 +40,6 @@ Options:
   --help         Show help                                             [boolean]
 
 Examples:
-  wordsafe init
-  wordsafe edit <encrypted-file> --editor=vim
+  wordsafe init encrypted-file
+  wordsafe edit encrypted-file --editor=vim
 ```
