@@ -6,11 +6,7 @@ const yargutils   = require('../utils/yarg-utils.js');
 module.exports = {
   command: 'init [file]',
   describe: 'Set up a new encrypted text file',
-  builder(yargs) {
-    yargs.option('specificTo_INIT', {
-      alias: 'x',
-      describe: 'this is specific to the init command'
-    });
+  builder() {
   },
   async handler(argv) {
     let prompter = new yargutils.Prompter();
