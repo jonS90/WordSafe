@@ -4,7 +4,7 @@ create, read, and edit encrypted text files.
 # Install
 
 ```
-npm install -g jonsmithers/WordSafe#node
+npm install -g jonsmithers/WordSafe
 ```
 
 This will also upgrade WordSafe if it's already installed.
@@ -12,7 +12,7 @@ This will also upgrade WordSafe if it's already installed.
 # Documentation
 
 WordSafe's help text is dynamically-generated with the
-[yargs](https://www.npmjs.com/package/yargs) npm package:
+[yargs](https://www.npmjs.com/package/yargs) npm package. Below is `wordsafe --help`, but you can also check out `wordafe help edit`, `wordsafe help push`, and `wordsafe help read`.
 
 ```
 $ wordsafe --help
