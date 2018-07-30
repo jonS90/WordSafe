@@ -9,6 +9,19 @@ npm install -g jonsmithers/WordSafe
 
 This will also upgrade WordSafe if it's already installed.
 
+# Example Usages
+
+```bash
+wordsafe init journal.txt                                    # create a new encrypted file (prompts for password)
+wordsafe read journal.txt --editor=vim                       # show encrypted file
+wordsafe edit journal.txt --editor=nano                      # edit encrypted file (re-encrypts when editor closes)
+wordsafe push journal.txt --editor=vim --prepend-date-loudly # open blank document and append to encrypted file when editor closes
+wordsafe help                                                # view main documentation
+wordsafe help edit                                           # view documentation on edit command
+wordsafe help push                                           # view documentation on push command
+wordsafe help read                                           # view documentation on read command
+```
+
 # Documentation
 
 WordSafe's help text is dynamically-generated with the
