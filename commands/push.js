@@ -1,10 +1,11 @@
-const CombinedStream = require('combined-stream');
-const config         = require('../config.js');
-const encryption     = require('../encryption.js');
-const fs             = require('fs');
-const streamUtils    = require('../utils/stream-utils.js');
-const tmp            = require('tmp');
-const yargutils      = require('../utils/yarg-utils.js');
+const CombinedStream  = require('combined-stream');
+const config          = require('../config.js');
+const encryption      = require('../encryption.js');
+const fs              = require('fs');
+const streamUtils     = require('../utils/stream-utils.js');
+const tmp             = require('tmp');
+const yargutils       = require('../utils/yarg-utils.js');
+const { makeDateStr } = require('../utils/misc.js');
 
 
 tmp.setGracefulCleanup(); // Cleanup temporary files even when an uncaught exception occurs
@@ -44,12 +45,10 @@ module.exports = {
         tmpFile.removeCallback();
       }
 
-      let dateStr = '\n' + new Date().toDateString() + ' ' + new Date().toLocaleTimeString() + '\n\n';
-
       // open empty file
       tmpFileWithNewContent = tmp.fileSync();
       if (argv['prepend-date-loudly']) {
-        fs.writeFileSync(tmpFileWithNewContent.name, dateStr + '\n');
+        fs.writeFileSync(tmpFileWithNewContent.name, makeDateStr() + '\n');
       }
       await config.openEditor(tmpFileWithNewContent.name, argv);
 
@@ -58,7 +57,7 @@ module.exports = {
 
       var combinedStream = new CombinedStream();
       combinedStream.append(fs.createReadStream(tmpFileForDecryption.name));
-      if (argv['prepend-date-quietly']) combinedStream.append(streamUtils.fromString(dateStr));
+      if (argv['prepend-date-quietly']) combinedStream.append(streamUtils.fromString(makeDateStr()));
       combinedStream.append(fs.createReadStream(tmpFileWithNewContent.name));
 
       await encryption.streams.encrypt(combinedStream, fs.createWriteStream(argv.file), password);

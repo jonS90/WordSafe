@@ -1,7 +1,9 @@
-const config     = require('../config.js');
-const encryption = require('../encryption.js');
-const tmp        = require('tmp');
-const yargutils  = require('../utils/yarg-utils.js');
+const config          = require('../config.js');
+const encryption      = require('../encryption.js');
+const tmp             = require('tmp');
+const yargutils       = require('../utils/yarg-utils.js');
+const { makeDateStr } = require('../utils/misc.js');
+const fs              = require('fs');
 
 tmp.setGracefulCleanup(); // Cleanup temporary files even when an uncaught exception occurs
 
@@ -13,7 +15,7 @@ module.exports = {
     yargs.boolean('d');
     yargs.option('d', {
       alias: 'append-date',
-      describe: '(NOT IMPLEMENTED) Append today\'s date'
+      describe: 'Append today\'s date'
     });
     yargs.boolean('x');
     yargs.option('x', {
@@ -26,6 +28,9 @@ module.exports = {
     var tmpFile = tmp.fileSync();
     try {
       await encryption.filenames.decrypt(argv.file, tmpFile.name, password);
+      if (argv['append-date']) {
+        fs.appendFileSync(tmpFile.name, makeDateStr() + '\n');
+      }
       await config.openEditor(tmpFile.name, argv);
       await encryption.filenames.encrypt(tmpFile.name, argv.file, password);
     } catch(e) {
