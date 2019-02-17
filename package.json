@@ -16,6 +16,7 @@
     "combined-stream": "^1.0.5",
     "inquirer": "^6.0.0",
     "opn": "^5.1.0",
+    "secure-remove": "^1.0.1",
     "stream-to-promise": "^2.2.0",
     "tmp": "^0.0.33",
     "yargs": "^8.0.2"

@@ -4,6 +4,7 @@ const tmp             = require('tmp');
 const yargutils       = require('../utils/yarg-utils.js');
 const { makeDateStr } = require('../utils/misc.js');
 const fs              = require('fs');
+const { polyfill }    = require('secure-remove');
 
 tmp.setGracefulCleanup(); // Cleanup temporary files even when an uncaught exception occurs
 
@@ -36,6 +37,7 @@ module.exports = {
     } catch(e) {
       console.error(e);
     }
+    await polyfill(tmpFile.name); // shred evidence
     tmpFile.removeCallback();
   }
 };

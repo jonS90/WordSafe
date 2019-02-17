@@ -6,6 +6,7 @@ const streamUtils     = require('../utils/stream-utils.js');
 const tmp             = require('tmp');
 const yargutils       = require('../utils/yarg-utils.js');
 const { makeDateStr } = require('../utils/misc.js');
+const { polyfill }    = require('secure-remove');
 
 
 tmp.setGracefulCleanup(); // Cleanup temporary files even when an uncaught exception occurs
@@ -42,6 +43,7 @@ module.exports = {
       { // check that we can decrypt without throwing any error
         let tmpFile = tmp.fileSync();
         await encryption.filenames.decrypt(argv.file, tmpFile.name, password);
+        await polyfill(tmpFile.name); // shred evidence
         tmpFile.removeCallback();
       }
 
@@ -64,7 +66,9 @@ module.exports = {
     } catch(e) {
       console.error(e);
     }
-    if (tmpFileWithNewContent) tmpFileWithNewContent.removeCallback();
-    if (tmpFileForDecryption)  tmpFileForDecryption.removeCallback();
+    await polyfill(tmpFileWithNewContent.name); // shred evidence
+    await polyfill(tmpFileForDecryption.name); // shred evidence
+    tmpFileWithNewContent.removeCallback();
+    tmpFileForDecryption.removeCallback();
   }
 };
