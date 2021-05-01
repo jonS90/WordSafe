@@ -23,12 +23,22 @@ module.exports = {
       alias: 'stdin-password',
       describe: '(NOT IMPLEMENTED) Read password from stdin'
     });
+    yargs.option('legacy-decrypt', {
+      describe: 'use legacy decryption'
+    });
   },
   async handler(argv) {
     var {password} = await new yargutils.Prompter().password().prompt();
     var tmpFile = tmp.fileSync();
     try {
-      await encryption.filenames.decrypt(argv.file, tmpFile.name, password);
+      await encryption.filenames.decrypt(
+        argv.file,
+        tmpFile.name,
+        password,
+        {
+          legacyDecryption: argv['legacy-decrypt'],
+        }
+      );
       if (argv['append-date']) {
         fs.appendFileSync(tmpFile.name, makeDateStr() + '\n');
       }
