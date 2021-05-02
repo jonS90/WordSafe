@@ -1,2 +1,8 @@
 /node_modules
 *.swp
+*-debug.log
+*-error.log
+/.nyc_output
+/dist
+/lib
+/tmp

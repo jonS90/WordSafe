@@ -1,6 +1,8 @@
 WordSafe is a simple command line utility that makes it quick and easy to
 create, read, and edit encrypted text files.
 
+[![Version](https://img.shields.io/npm/v/wordsafe.svg)](https://npmjs.org/package/wordsafe)
+
 # Install
 
 ```
@@ -22,37 +24,138 @@ wordsafe help push                                           # view documentatio
 wordsafe help read                                           # view documentation on read command
 ```
 
-# Documentation
+<!-- toc -->
+* [Install](#install)
+* [Example Usages](#example-usages)
+* [Usage](#usage)
+* [Commands](#commands)
+<!-- tocstop -->
+# Usage
+<!-- usage -->
+```sh-session
+$ npm install -g wordsafe
+$ wordsafe COMMAND
+running command...
+$ wordsafe (-v|--version|version)
+wordsafe/2.0.0 darwin-arm64 node-v15.14.0
+$ wordsafe --help [COMMAND]
+USAGE
+  $ wordsafe COMMAND
+...
+```
+<!-- usagestop -->
+# Commands
+<!-- commands -->
+* [`wordsafe edit FILE`](#wordsafe-edit-file)
+* [`wordsafe help [COMMAND]`](#wordsafe-help-command)
+* [`wordsafe init FILE`](#wordsafe-init-file)
+* [`wordsafe push FILE`](#wordsafe-push-file)
+* [`wordsafe read FILE`](#wordsafe-read-file)
 
-WordSafe's help text is dynamically-generated with the
-[yargs](https://www.npmjs.com/package/yargs) npm package. Below is `wordsafe --help`, but you can also check out `wordafe help edit`, `wordsafe help push`, and `wordsafe help read`.
+## `wordsafe edit FILE`
+
+Edit encrypted file with editor of your choice
 
 ```
-$ wordsafe --help
-wordsafe
+USAGE
+  $ wordsafe edit FILE
 
-Usage:
-  wordsafe <command> [options]
+ARGUMENTS
+  FILE  encrypted file
 
-Description:
-  WordSafe makes it practical to decrypt and re-encrypted a plaintext file on a
-  regular basis.
+OPTIONS
+  -e, --editor=editor  [default: vim] open unencrypted file with editor
+  -h, --help           show CLI help
+  --append-date        append current date to end of file
+  --legacy-decrypt
 
-Commands:
-  init [file]      Set up a new encrypted text file
-  edit <file>      Edit encrypted file with editor of your choice
-  push <file>      Open an empty editor for you to type in and append the
-                   contents you type to <file>
-  read <file>      View encrypted file but don't save changes
-  change-password  (NOT IMPLEMENTED)
-  change-cipher    (NOT IMPLEMENTED)
-  decrypt <file>   Decrypt file to stdout
+EXAMPLES
+  $ wordsafe edit encrypted-file
 
-Options:
-  -v, --verbose  Chatty logs                                           [boolean]
-  --help         Show help                                             [boolean]
-
-Examples:
-  wordsafe init encrypted-file
-  wordsafe edit encrypted-file --editor=vim
+  $ wordsafe edit encrypted-file --editor=nano
 ```
+
+_See code: [src/commands/edit.ts](https://github.com/jonsmithers/wordsafe/blob/v2.0.0/src/commands/edit.ts)_
+
+## `wordsafe help [COMMAND]`
+
+display help for wordsafe
+
+```
+USAGE
+  $ wordsafe help [COMMAND]
+
+ARGUMENTS
+  COMMAND  command to show help for
+
+OPTIONS
+  --all  see all commands in CLI
+```
+
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.2/src/commands/help.ts)_
+
+## `wordsafe init FILE`
+
+Set up a new encrypted text file
+
+```
+USAGE
+  $ wordsafe init FILE
+
+ARGUMENTS
+  FILE  encrypted file
+
+EXAMPLE
+  $ wordsafe init <file>
+```
+
+_See code: [src/commands/init.ts](https://github.com/jonsmithers/wordsafe/blob/v2.0.0/src/commands/init.ts)_
+
+## `wordsafe push FILE`
+
+Open an empty editor for you to type in and append the contents you type to <file>
+
+```
+USAGE
+  $ wordsafe push FILE
+
+ARGUMENTS
+  FILE  encrypted file
+
+OPTIONS
+  -D, --prepend-date-loudly   prepend current date before opening file
+  -d, --prepend-date-quietly  prepend current date after closing file
+  -e, --editor=editor         [default: vim] open unencrypted file with editor
+  -h, --help                  show CLI help
+
+EXAMPLE
+  $ wordsafe push encrypted-file
+```
+
+_See code: [src/commands/push.ts](https://github.com/jonsmithers/wordsafe/blob/v2.0.0/src/commands/push.ts)_
+
+## `wordsafe read FILE`
+
+Decrypt contents for perusal (doesn't save changes)
+
+```
+USAGE
+  $ wordsafe read FILE
+
+ARGUMENTS
+  FILE  encrypted file
+
+OPTIONS
+  -e, --editor=editor  [default: less] open unencrypted file with editor
+  -h, --help           show CLI help
+  --legacy-decrypt
+
+EXAMPLES
+  $ wordsafe read encrypted-file
+
+  $ wordsafe read encrypted-file --editor=cat
+  # ^ this prints decrypted file to stdout
+```
+
+_See code: [src/commands/read.ts](https://github.com/jonsmithers/wordsafe/blob/v2.0.0/src/commands/read.ts)_
+<!-- commandsstop -->
