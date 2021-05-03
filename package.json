@@ -1,6 +1,6 @@
 {
   "name": "wordsafe",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "author": "Jon Smithers @jonsmithers",
   "bin": {
     "wordsafe": "./bin/run"
@@ -25,7 +25,8 @@
     "commands": "./lib/commands",
     "bin": "wordsafe",
     "plugins": [
-      "@oclif/plugin-help"
+      "@oclif/plugin-help",
+      "@oclif/plugin-autocomplete"
     ]
   },
   "repository": "jonsmithers/wordsafe",
@@ -40,6 +41,7 @@
   "dependencies": {
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
+    "@oclif/plugin-autocomplete": "^0.3.0",
     "@oclif/plugin-help": "^3.2.2",
     "@types/combined-stream": "^1.0.2",
     "@types/stream-to-promise": "^2.2.1",

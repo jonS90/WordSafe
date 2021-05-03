@@ -37,7 +37,7 @@ $ npm install -g wordsafe
 $ wordsafe COMMAND
 running command...
 $ wordsafe (-v|--version|version)
-wordsafe/2.0.0 darwin-arm64 node-v15.14.0
+wordsafe/2.1.0 darwin-arm64 node-v15.14.0
 $ wordsafe --help [COMMAND]
 USAGE
   $ wordsafe COMMAND
@@ -46,11 +46,35 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
+* [`wordsafe autocomplete [SHELL]`](#wordsafe-autocomplete-shell)
 * [`wordsafe edit FILE`](#wordsafe-edit-file)
 * [`wordsafe help [COMMAND]`](#wordsafe-help-command)
 * [`wordsafe init FILE`](#wordsafe-init-file)
 * [`wordsafe push FILE`](#wordsafe-push-file)
 * [`wordsafe read FILE`](#wordsafe-read-file)
+
+## `wordsafe autocomplete [SHELL]`
+
+display autocomplete installation instructions
+
+```
+USAGE
+  $ wordsafe autocomplete [SHELL]
+
+ARGUMENTS
+  SHELL  shell type
+
+OPTIONS
+  -r, --refresh-cache  Refresh cache (ignores displaying instructions)
+
+EXAMPLES
+  $ wordsafe autocomplete
+  $ wordsafe autocomplete bash
+  $ wordsafe autocomplete zsh
+  $ wordsafe autocomplete --refresh-cache
+```
+
+_See code: [@oclif/plugin-autocomplete](https://github.com/oclif/plugin-autocomplete/blob/v0.3.0/src/commands/autocomplete/index.ts)_
 
 ## `wordsafe edit FILE`
 
@@ -75,7 +99,7 @@ EXAMPLES
   $ wordsafe edit encrypted-file --editor=nano
 ```
 
-_See code: [src/commands/edit.ts](https://github.com/jonsmithers/wordsafe/blob/v2.0.0/src/commands/edit.ts)_
+_See code: [src/commands/edit.ts](https://github.com/jonsmithers/wordsafe/blob/v2.1.0/src/commands/edit.ts)_
 
 ## `wordsafe help [COMMAND]`
 
@@ -109,7 +133,7 @@ EXAMPLE
   $ wordsafe init <file>
 ```
 
-_See code: [src/commands/init.ts](https://github.com/jonsmithers/wordsafe/blob/v2.0.0/src/commands/init.ts)_
+_See code: [src/commands/init.ts](https://github.com/jonsmithers/wordsafe/blob/v2.1.0/src/commands/init.ts)_
 
 ## `wordsafe push FILE`
 
@@ -132,7 +156,7 @@ EXAMPLE
   $ wordsafe push encrypted-file
 ```
 
-_See code: [src/commands/push.ts](https://github.com/jonsmithers/wordsafe/blob/v2.0.0/src/commands/push.ts)_
+_See code: [src/commands/push.ts](https://github.com/jonsmithers/wordsafe/blob/v2.1.0/src/commands/push.ts)_
 
 ## `wordsafe read FILE`
 
@@ -157,5 +181,5 @@ EXAMPLES
   # ^ this prints decrypted file to stdout
 ```
 
-_See code: [src/commands/read.ts](https://github.com/jonsmithers/wordsafe/blob/v2.0.0/src/commands/read.ts)_
+_See code: [src/commands/read.ts](https://github.com/jonsmithers/wordsafe/blob/v2.1.0/src/commands/read.ts)_
 <!-- commandsstop -->
