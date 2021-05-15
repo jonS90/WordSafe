@@ -15,8 +15,8 @@ export default class Read extends WordsafeCommand {
   static flags = {
     help: flags.help({char: 'h'}),
     ...SHARED_FLAGS.editor('vim'),
-    'prepend-date-loudly': flags.boolean({char: 'D', description: 'prepend current date before opening file'}),
-    'prepend-date-quietly': flags.boolean({char: 'd', description: 'prepend current date after closing file'}),
+    'prepend-date-visibly': flags.boolean({char: 'D', description: 'prepend current date before opening file'}),
+    'prepend-date': flags.boolean({char: 'd', description: 'prepend current date after closing file'}),
   }
 
   static args = [{
@@ -38,7 +38,7 @@ export default class Read extends WordsafeCommand {
 
     // open empty file
     await withTempFile(async emptyTmpFile => {
-      if (flags['prepend-date-loudly']) {
+      if (flags['prepend-date-visibly']) {
         fs.writeFileSync(emptyTmpFile, makeDateStr() + '\n')
       }
 
@@ -49,7 +49,7 @@ export default class Read extends WordsafeCommand {
         await encryption.filenames.decrypt(args.file, decryptedTmpFile, password)
         const combinedStream = new CombinedStream()
         combinedStream.append(fs.createReadStream(decryptedTmpFile))
-        if (flags['prepend-date-quietly']) {
+        if (flags['prepend-date']) {
           combinedStream.append(stringToStream(makeDateStr()))
         }
         combinedStream.append(fs.createReadStream(emptyTmpFile))

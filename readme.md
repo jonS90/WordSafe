@@ -14,14 +14,14 @@ This will also upgrade WordSafe if it's already installed.
 # Example Usages
 
 ```bash
-wordsafe init journal.txt                                    # create a new encrypted file (prompts for password)
-wordsafe read journal.txt --editor=vim                       # show encrypted file
-wordsafe edit journal.txt --editor=nano                      # edit encrypted file (re-encrypts when editor closes)
-wordsafe push journal.txt --editor=vim --prepend-date-loudly # open blank document and append to encrypted file when editor closes
-wordsafe help                                                # view main documentation
-wordsafe help edit                                           # view documentation on edit command
-wordsafe help push                                           # view documentation on push command
-wordsafe help read                                           # view documentation on read command
+wordsafe init journal.txt                                     # create a new encrypted file (prompts for password)
+wordsafe read journal.txt --editor=vim                        # show encrypted file
+wordsafe edit journal.txt --editor=nano                       # edit encrypted file (re-encrypts when editor closes)
+wordsafe push journal.txt --editor=vim --prepend-date-visibly # open blank document and append to encrypted file when editor closes
+wordsafe help                                                 # view main documentation
+wordsafe help edit                                            # view documentation on edit command
+wordsafe help push                                            # view documentation on push command
+wordsafe help read                                            # view documentation on read command
 ```
 
 <!-- toc -->
@@ -147,8 +147,8 @@ ARGUMENTS
   FILE  encrypted file
 
 OPTIONS
-  -D, --prepend-date-loudly   prepend current date before opening file
-  -d, --prepend-date-quietly  prepend current date after closing file
+  -D, --prepend-date-visibly  prepend current date before opening file
+  -d, --prepend-date          prepend current date after closing file
   -e, --editor=editor         [default: vim] open unencrypted file with editor
   -h, --help                  show CLI help
 
