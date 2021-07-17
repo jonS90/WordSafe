@@ -8,7 +8,8 @@ import {polyfill} from 'secure-remove'
 
 export function openFile(editor: string, filepath: string) {
   return new Promise((resolve, reject) => {
-    const p = child_process.spawn(editor, [filepath], {
+    const [editorCmd, ...editorArgs] = editor.split(' ')
+    const p = child_process.spawn(editorCmd, [...editorArgs, filepath], {
       stdio: 'inherit',
     })
     p.on('close', resolve)
