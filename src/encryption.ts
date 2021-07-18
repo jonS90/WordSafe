@@ -28,6 +28,22 @@ const encryption = {
         }),
       ])
     },
+    encryptSecurely(inputStream: fs.ReadStream | stream.Readable, outputStream: fs.WriteStream, password: string) {
+      const iv = randomInitializationVector()
+      const cipher = crypto.createCipheriv('aes192', passwordToKey(password), iv)
+      inputStream.pipe(cipher).pipe(outputStream)
+      return Promise.all([
+        streamToPromise(inputStream).catch(error  => {
+          throw new Error('Failed to read file. ' + error.message)
+        }),
+        streamToPromise(cipher).catch(error       => {
+          throw new Error('Failed to encrypt. ' + error.message)
+        }),
+        streamToPromise(outputStream).catch(error => {
+          throw new Error('Failed to write file. ' + error.message)
+        }),
+      ])
+    },
     decrypt(inputStream: fs.ReadStream, outputStream: fs.WriteStream, password: string, opts: { legacyDecryption?: boolean } = {}) {
       /* eslint-disable node/no-deprecated-api, no-throw-literal */
       const cipher = opts.legacyDecryption ?
@@ -69,12 +85,12 @@ const INITIALIZATION_VECTOR = new Uint8Array(16);
 ].forEach((v, i) => {
   INITIALIZATION_VECTOR[i] = v
 })
-/* function randomInitializationVector() {
- *   const initializationVector = new Uint8Array(16);
- *   crypto.randomFillSync(initializationVector);
- *   return initializationVector;
- * }
- */
+
+function randomInitializationVector() {
+  const initializationVector = new Uint8Array(16)
+  crypto.randomFillSync(initializationVector)
+  return initializationVector
+}
 
 function passwordToKey(password: string): Buffer {
   return crypto.pbkdf2Sync(password, 'salt', 100000, 192 / 8, 'sha512')
