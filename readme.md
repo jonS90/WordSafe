@@ -38,7 +38,7 @@ $ npm install -g wordsafe
 $ wordsafe COMMAND
 running command...
 $ wordsafe (-v|--version|version)
-wordsafe/2.1.0 darwin-arm64 node-v15.14.0
+wordsafe/2.1.0 darwin-arm64 node-v17.2.0
 $ wordsafe --help [COMMAND]
 USAGE
   $ wordsafe COMMAND

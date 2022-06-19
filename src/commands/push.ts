@@ -29,7 +29,7 @@ export default class Read extends WordsafeCommand {
     const {args, flags} = this.parse(Read)
 
     const editor = flags.editor
-    const password = await cli.prompt('Password', {type: 'hide'})
+    const password = await cli.prompt('Password', {type: 'hide', required: false})
 
     // check that we can decrypt without throwing any error
     await withTempFile(async testFile => {

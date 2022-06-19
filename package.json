@@ -1,6 +1,6 @@
 {
   "name": "wordsafe",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "author": "Jon Smithers @jonsmithers",
   "bin": {
     "wordsafe": "./bin/run"
@@ -58,7 +58,7 @@
     "@oclif/test": "^1.2.8",
     "@types/chai": "^4.2.17",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^10.17.59",
+    "@types/node": "^18.0.0",
     "chai": "^4.3.4",
     "eslint": "^5.16.0",
     "eslint-config-oclif": "^3.1.0",

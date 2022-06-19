@@ -16,6 +16,7 @@ export default class Read extends WordsafeCommand {
     help: flags.help({char: 'h'}),
     ...SHARED_FLAGS.editor('less'),
     ...SHARED_FLAGS.legacyDecrypt,
+    ...SHARED_FLAGS.legacyLegacyDecrypt,
   }
 
   static args = [{
@@ -28,7 +29,7 @@ export default class Read extends WordsafeCommand {
     const {args, flags} = this.parse(Read)
 
     const editor = flags.editor
-    const password = await cli.prompt('Password', {type: 'hide'})
+    const password = await cli.prompt('Password', {type: 'hide', required: false})
     await withTempFile(async tmpFile => {
       await encryption.filenames.decrypt(
         args.file,
@@ -36,6 +37,7 @@ export default class Read extends WordsafeCommand {
         password,
         {
           legacyDecryption: flags['legacy-decrypt'],
+          legacyLegacyDecryption: flags['legacy-legacy-decrypt'],
         }
       )
       fs.chmodSync(tmpFile, 0o400) // make file readonly

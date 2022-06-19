@@ -19,7 +19,7 @@ export default class Read extends WordsafeCommand {
   async run() {
     const {args} = this.parse(Read)
 
-    const password = await cli.prompt('Password', {type: 'hide'})
+    const password = await cli.prompt('Password', {type: 'hide', required: false})
     const file = args.file
     const unencryptedStream = stringToStream('Welcome to your encrypted text file :-)')
     await encryption.streams.encrypt(unencryptedStream, fs.createWriteStream(file), password)

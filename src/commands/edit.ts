@@ -16,6 +16,7 @@ export default class Edit extends WordsafeCommand {
     help: flags.help({char: 'h'}),
     ...SHARED_FLAGS.editor('vim'),
     ...SHARED_FLAGS.legacyDecrypt,
+    ...SHARED_FLAGS.legacyLegacyDecrypt,
     'append-date': flags.boolean({description: 'append current date to end of file'}),
   }
 
@@ -29,9 +30,10 @@ export default class Edit extends WordsafeCommand {
     const {args, flags} = this.parse(Edit)
 
     const editor = flags.editor
-    const password = await cli.prompt('Password', {type: 'hide'})
+    const password = await cli.prompt('Password', {type: 'hide', required: false})
     await withTempFile(async tmpFile => {
       await encryption.filenames.decrypt(args.file, tmpFile, password, {
+        legacyLegacyDecryption: flags['legacy-legacy-decrypt'],
         legacyDecryption: flags['legacy-decrypt'],
       })
       if (flags['append-date']) {

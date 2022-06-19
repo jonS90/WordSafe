@@ -64,6 +64,9 @@ export const SHARED_FLAGS = {
   legacyDecrypt: {
     'legacy-decrypt': flags.boolean({}),
   },
+  legacyLegacyDecrypt: {
+    'legacy-legacy-decrypt': flags.boolean({}),
+  },
 }
 
 export const makeDateStr = () => ('\n' + new Date().toDateString() + ' ' + new Date().toLocaleTimeString() + '\n\n')
